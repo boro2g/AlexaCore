@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Alexa.NET" Version="1.1.0" />
+    <PackageReference Include="Amazon.Lambda.TestUtilities" Version="1.0.0" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AlexaCore\AlexaCore.csproj" />
+  </ItemGroup>
+
+</Project>

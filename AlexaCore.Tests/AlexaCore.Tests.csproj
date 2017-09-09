@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+	<IsPackable>true</IsPackable>
+    <Authors>boro2g</Authors>
+    <Company>boro2g</Company>
+    <Description>Some helpers for streamlining testing of AlexaCore C# Lambda functions</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.TestUtilities" Version="1.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AlexaCore.Testing\AlexaCore.Testing.csproj" />
+    <ProjectReference Include="..\AlexaCore\AlexaCore.csproj" />
+  </ItemGroup>  
+
+</Project>
