@@ -21,6 +21,8 @@ namespace AlexaCore
 		    return null;
 		}
 
+        private AlexaContext AlexaContext { get; set; }
+
 		public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
 		{
 			_intentFactory = IntentFactory();
@@ -29,9 +31,9 @@ namespace AlexaCore
 
             var parameters = new IntentParameters(context.Logger, input.Session);
 
-            var alexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
+		    AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
 
-			FunctionInit(alexaContext, parameters);
+			FunctionInit(AlexaContext, parameters);
 
 			var innerResponse = Run(input, parameters);
 

@@ -75,6 +75,13 @@ namespace AlexaCore.Testing
             return RunTest(intentName, Session.SessionId, Session);
         }
 
+        public AlexaCoreTestRunner VerifyIntentIsLoaded(string intentName)
+        {
+            Assert.That(AlexaContext.IntentFactory.RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
+
+            return this;
+        }
+
         public AlexaCoreTestRunner VerifyOutputSpeech()
         {
             ValidateHasRun();
