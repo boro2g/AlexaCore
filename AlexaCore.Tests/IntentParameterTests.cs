@@ -1,6 +1,7 @@
-﻿using NUnit.Framework;
+﻿using AlexaCore.Tests.Function;
+using NUnit.Framework;
 
-namespace AlexaCore.Tests.Function.Tests
+namespace AlexaCore.Tests
 {
     [TestFixture]
     class IntentParameterTests
