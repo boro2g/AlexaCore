@@ -4,6 +4,7 @@ using System.Linq;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
+using AlexaCore.Intents;
 using Amazon.Lambda.TestUtilities;
 using NUnit.Framework;
 
@@ -38,7 +39,7 @@ namespace AlexaCore.Testing
 
         public abstract AlexaFunction BuildFunction();
         
-        public AlexaCoreTestRunner RunTest(string intentName, string newSessionId = "", Session session = null, Context context = null)
+        public AlexaCoreTestRunner RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null)
         {
             var lambdaContext = new TestLambdaContext
             {
@@ -72,7 +73,7 @@ namespace AlexaCore.Testing
         {
             ValidateHasRun();
 
-            return RunTest(intentName, Session.SessionId, Session);
+            return RunInitialFunction(intentName, Session.SessionId, Session);
         }
 
         public AlexaCoreTestRunner VerifyIntentIsLoaded(string intentName)
@@ -95,7 +96,7 @@ namespace AlexaCore.Testing
         {
             if (!_hasRun)
             {
-                throw new Exception("Need to RunTest before you can verify the output");
+                throw new Exception("Need to RunInitialFunction before you can verify the output");
             }
         }
 

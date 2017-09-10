@@ -11,9 +11,9 @@ namespace AlexaCore.Intents
 	{
 		protected IntentParameters Parameters;
 
-		public abstract string IntentName { get; }
+		public virtual string IntentName => GetType().Name;
 
-		protected AlexaIntent(IntentParameters parameters)
+	    protected AlexaIntent(IntentParameters parameters)
 		{
 			Parameters = parameters;
 		}

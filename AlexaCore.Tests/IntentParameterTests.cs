@@ -6,11 +6,13 @@ namespace AlexaCore.Tests
     [TestFixture]
     class IntentParameterTests
     {
+        private const string LaunchIntentName = "LaunchIntent";
+
         [Test]
         public void InputQueue_StringItemAddedCorrectly()
         {
             new TestFunctionTestRunner()
-                .RunTest("LaunchIntent")
+                .RunInitialFunction(LaunchIntentName)
                 .VerifySessionInputQueue("string");
         }
 
@@ -18,7 +20,7 @@ namespace AlexaCore.Tests
         public void InputQueue_StringItemWithTagsAddedCorrectly()
         {
             new TestFunctionTestRunner()
-                .RunTest("LaunchIntent")
+                .RunInitialFunction(LaunchIntentName)
                 .VerifySessionInputQueue("stringWithTags")
                 .VerifySessionInputQueue("stringWithTags", new[] { "tag1", "tag2" });
         }
@@ -27,18 +29,35 @@ namespace AlexaCore.Tests
         public void CommandQueue_ItemAddedCorrectly()
         {
             new TestFunctionTestRunner()
-                .RunTest("LaunchIntent")
-                .VerifySessionCommandQueue("LaunchIntent");
+                .RunInitialFunction(LaunchIntentName)
+                .VerifySessionCommandQueue(LaunchIntentName);
+        }
+
+        [Test]
+        public void CommandQueue_CommandKeyCanBeChanged()
+        {
+            new TestFunctionTestRunner()
+                .RunInitialFunction(LaunchIntentName)
+                .RunAgain("CommandQueueNameChangerIntent")
+                .VerifySessionCommandQueue("FakeCommandDefinitionName");
         }
 
         [Test]
         public void ApplicationParameters_ItemAddedCorrectly()
         {
             new TestFunctionTestRunner()
-                .RunTest("LaunchIntent")
+                .RunInitialFunction(LaunchIntentName)
                 .VerifySessionApplicationParameters("name", "value");
         }
 
-        //todo - add test showing parameters getting updated
+        [Test]
+        public void ApplicationParameters_ItemGetsUpdatedCorrectly()
+        {
+            new TestFunctionTestRunner()
+                .RunInitialFunction(LaunchIntentName)
+                .VerifySessionApplicationParameters("name", "value")
+                .RunAgain("ParameterUpdaterIntent")
+                .VerifySessionApplicationParameters("name", "value updated");
+        }
     }
 }

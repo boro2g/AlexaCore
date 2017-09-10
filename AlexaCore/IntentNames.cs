@@ -11,5 +11,7 @@
 	    public virtual string CancelIntent => "AMAZON.CancelIntent";
 
 	    public virtual string StopIntent => "AMAZON.StopIntent";
-	}
+
+        public virtual string DefaultDebugIntent => "DefaultDebugIntent";
+    }
 }

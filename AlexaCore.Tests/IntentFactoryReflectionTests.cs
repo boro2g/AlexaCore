@@ -12,7 +12,7 @@ namespace AlexaCore.Tests
             string helpIntentName = new IntentNames().HelpIntent;
 
             new TestFunctionTestRunner()
-                .RunTest(helpIntentName)
+                .RunInitialFunction(helpIntentName)
                 .VerifyIntentIsLoaded("LaunchIntent")
                 .VerifyIntentIsLoaded(helpIntentName);
         }

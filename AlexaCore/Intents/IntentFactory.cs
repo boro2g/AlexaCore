@@ -36,6 +36,11 @@ namespace AlexaCore.Intents
 				    dictionary[AlexaContext.IntentNames.StopIntent] = StopIntent(intentParameters);
 			    }
 
+		        if (IncludeDefaultDebugIntent() && !dictionary.ContainsKey(AlexaContext.IntentNames.DefaultDebugIntent))
+		        {
+		            dictionary[AlexaContext.IntentNames.DefaultDebugIntent] = DefaultDebugIntent(intentParameters);
+                }
+
 				_intents = dictionary;
 		    }
 
@@ -61,6 +66,11 @@ namespace AlexaCore.Intents
 		    return _intents[AlexaContext.IntentNames.HelpIntent];
 	    }
 
+        public virtual bool IncludeDefaultDebugIntent()
+        {
+            return false;
+        }
+
 	    public IEnumerable<string> RegisteredIntents()
 	    {
 		    return _intents?.Keys.Select(a => a) ?? new string[0];
@@ -75,5 +85,10 @@ namespace AlexaCore.Intents
 	    {
 		    return new DefaultStopIntent(intentParameters);
 	    }
+
+        protected virtual AlexaIntent DefaultDebugIntent(IntentParameters intentParameters)
+        {
+            return new DefaultDebugIntent(intentParameters);
+        }
     }
 }
