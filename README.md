@@ -101,6 +101,22 @@ To replace with your own you simply need to create Intents that are named `"AMAZ
 # Extensions:
 Some IEnumerable extensions are available to: `PickRandom`, `Shuffle` and `JoinStringList`. The latter is useful for pretty printing lists of strings. The output for an array `new[] { "1","2","3" }` will be: `"1, 2 and 3"`
 
+# Global properties ala IOC Container
+You can register global properties much like you would with an IOC container. In your implementation of **AlexaFunction** you can setup any registrations:
+```csharp
+protected override void FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+{
+    AlexaContext.Container.RegisterType("key", () => new GlobalTypeOrDataStore(new AmazonDynamoDBClient()));
+}
+```
+Which can then be resolved anywhere else in your code via:
+```csharp
+protected override void FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+{
+    _dataStore = AlexaContext.Container.Resolve<IDataStore>("key");
+}
+```
+
 # Unit Testing your function:
 The `AlexaCore.Testing` project contains a wrapper to assist fluently testing your function. You need to implement `AlexaCoreTestRunner` - see `TestFunctionTestRunner` as an example.
 
