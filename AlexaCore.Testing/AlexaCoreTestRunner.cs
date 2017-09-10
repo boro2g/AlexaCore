@@ -50,6 +50,8 @@ namespace AlexaCore.Testing
                 slots = new Dictionary<string, Slot>();
             }
 
+            AlexaContext.Container.Reset();
+
             RegisterTypes();
 
             var response =
@@ -191,6 +193,13 @@ namespace AlexaCore.Testing
             List<T> parameters = (List<T>)SkillResponse.SessionAttributes[sessionKey];
 
             return parameters;
+        }
+
+        public T Resolve<T>(string key)
+        {
+            ValidateHasRun();
+
+            return AlexaContext.Container.Resolve<T>(key);
         }
     }
 }
