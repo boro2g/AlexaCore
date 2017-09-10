@@ -37,7 +37,7 @@ namespace AlexaCore.Tests
             new TestFunctionTestRunner()
                 .RunInitialFunction("QuestionNeedingResponseIntent", slots: slots)
                 .RunAgain("AnotherResponseIntent")
-                .VerifyOutputSpeechValue("I wasn't expecting that answer - how about no or yes");
+                .VerifyOutputSpeechValue("I wasn't expecting that answer - how about no or yes or external");
         }
 
         [Test]
