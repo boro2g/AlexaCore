@@ -28,6 +28,14 @@ namespace AlexaCore.Tests.Function.Intents
 
             //or build your own response
             yield return new PossibleResponse("YesIntent", "yes", YesResponse, "");
+
+            //or pull the response from elsewhere
+            yield return new PossibleResponse("ExternalResponseIntent", "external", ExternalResponse, "");
+        }
+
+        private SkillResponse ExternalResponse(string arg)
+        {
+            return AlexaContext.IntentFactory.GetIntent("LaunchIntent").GetResponse(Slots);
         }
 
         private SkillResponse NoResponse(string parameterValue)

@@ -12,15 +12,20 @@ namespace AlexaCore.Intents
 	{
 		protected IntentParameters Parameters;
 
-		public virtual string IntentName => GetType().Name;
+	    protected Dictionary<string, Slot> Slots { get; private set; }
+
+	    public virtual string IntentName => GetType().Name;
+
 
 	    protected AlexaIntent(IntentParameters parameters)
 		{
 			Parameters = parameters;
 		}
 
-		public SkillResponse GetResponse(Dictionary<string, Slot> slots)
+	    public SkillResponse GetResponse(Dictionary<string, Slot> slots)
 		{
+		    Slots = slots;
+
 			Parameters.Logger.LogLine($"Intent called: {IntentName}");
 
 			if (!ValidateSlots(slots))

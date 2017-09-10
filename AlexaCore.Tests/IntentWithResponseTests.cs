@@ -39,5 +39,19 @@ namespace AlexaCore.Tests
                 .RunAgain("AnotherResponseIntent")
                 .VerifyOutputSpeechValue("I wasn't expecting that answer - how about no or yes");
         }
+
+        [Test]
+        public void WhenIntentExpectsResponse_ExternalDataIsReturned()
+        {
+            var slots = new Dictionary<string, Slot>
+            {
+                ["TestSlot"] = new Slot { Value = "TestSlotValue", Name = "TestSlot" }
+            };
+
+            new TestFunctionTestRunner()
+                .RunInitialFunction("QuestionNeedingResponseIntent", slots: slots)
+                .RunAgain("ExternalResponseIntent")
+                .VerifyOutputSpeechValue("LaunchIntent");
+        }
     }
 }
