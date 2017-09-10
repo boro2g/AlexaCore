@@ -80,13 +80,42 @@ To store the data you could call: `Parameters.ApplicationParameters.Enqueue(new 
 Updating parameters or values is possible - each queue has an `Update` method available.
 
 # Chaining intents:
-A relatively common scenario is to chain intents. 
+A relatively common scenario is to chain intents. Imagine you load an intent which prompts the user for confirmation: 
+_I'm going to do something. Are you ok with that?_
+_Yes / no_
+Via `IntentWithResponse` and `IntentAsResponse` this link can be achieved. See `QuestionNeedingResponseIntent` in the test project as an example. You can specify which responses are considered valid - in this example yes and no. If an invalid response is given an error is returned indicating which responses are considered valid.
+
+Within the Response method you can pull the value back from counterpart intents. E.g. 
+```csharp
+private SkillResponse ExternalResponse(string arg)
+{
+    return AlexaContext.IntentFactory.GetIntent("LaunchIntent").GetResponse(Slots);
+}
+```
 
 # Default intents:
-Todo
+The core function code registers some default Intents: `DefaultStopIntent`,`DefaultCancelIntent` and optionally `DefaultDebugIntent`. You can trigger the `DefaultDebugIntent` to be included via the IntentFactory: `IncludeDefaultDebugIntent`. You can also override the cancel and stop intent's or register your own. 
+
+To replace with your own you simply need to create Intents that are named `"AMAZON.CancelIntent"` or `"AMAZON.StopIntent"` and register them.
 
 # Extensions:
-Todo
+Some IEnumerable extensions are available to: `PickRandom`, `Shuffle` and `JoinStringList`. The latter is useful for pretty printing lists of strings. The output for an array `new[] { "1","2","3" }` will be: `"1, 2 and 3"`
 
 # Unit Testing your function:
-Todo
+The `AlexaCore.Testing` project contains a wrapper to assist fluently testing your function. You need to implement `AlexaCoreTestRunner` - see `TestFunctionTestRunner` as an example.
+
+To then run tests you would use e.g.:
+```csharp
+[Test]
+public void WhenSlotsAreUsed_CorrectValueIsParsed()
+{
+    var slots = new Dictionary<string, Slot>
+    {
+        ["TestSlot"] = new Slot {Value = "TestSlotValue", Name = "TestSlot"}
+    };
+
+    new TestFunctionTestRunner()
+        .RunInitialFunction("SlotIntent", slots: slots)
+        .VerifyOutputSpeechValue("Slot value: TestSlotValue");
+}
+```
