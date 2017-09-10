@@ -24,7 +24,7 @@ namespace AlexaCore.Intents
 
 	    public virtual string UnexpectedResponse()
 	    {
-			return $"Hmm, I wasn't expecting that answer - how about {String.Join(" or ", PossibleResponses().Select(a => a.IntentAsText))}";
+			return $"I wasn't expecting that answer - how about {String.Join(" or ", PossibleResponses().Select(a => a.IntentAsText))}";
 		}
     }
 }

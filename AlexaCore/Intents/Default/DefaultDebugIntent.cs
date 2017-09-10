@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Alexa.NET.Request;
 using Alexa.NET.Response;
 using AlexaCore.Extensions;
@@ -16,10 +17,10 @@ namespace AlexaCore.Intents.Default
 
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
-            return Tell($"Intents: {AlexaContext.IntentFactory.RegisteredIntents().JoinStringList()}." +
-                        $"ApplicationParameters: {JsonConvert.SerializeObject(AlexaContext.Parameters.ApplicationParameters)}." +
-                        $"CommandQueue: {JsonConvert.SerializeObject(AlexaContext.Parameters.CommandQueue)}." +
-                        $"InputQueue: {JsonConvert.SerializeObject(AlexaContext.Parameters.InputQueue)}.");
+            return Tell($"Intents: {AlexaContext.IntentFactory.RegisteredIntents().JoinStringList()}.{Environment.NewLine}" +
+                        $"ApplicationParameters: {JsonConvert.SerializeObject(AlexaContext.Parameters.ApplicationParameters)}.{Environment.NewLine}" +
+                        $"CommandQueue: {JsonConvert.SerializeObject(AlexaContext.Parameters.CommandQueue)}.{Environment.NewLine}" +
+                        $"InputQueue: {JsonConvert.SerializeObject(AlexaContext.Parameters.InputQueue)}.{Environment.NewLine}");
         }
     }
 }

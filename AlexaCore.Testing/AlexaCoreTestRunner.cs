@@ -4,7 +4,6 @@ using System.Linq;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
-using AlexaCore.Intents;
 using Amazon.Lambda.TestUtilities;
 using NUnit.Framework;
 
@@ -39,12 +38,17 @@ namespace AlexaCore.Testing
 
         public abstract AlexaFunction BuildFunction();
         
-        public AlexaCoreTestRunner RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null)
+        public AlexaCoreTestRunner RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null)
         {
             var lambdaContext = new TestLambdaContext
             {
                 Logger = new TestLambdaLogger(),
             };
+
+            if (slots == null)
+            {
+                slots = new Dictionary<string, Slot>();
+            }
 
             RegisterTypes();
 
@@ -53,7 +57,7 @@ namespace AlexaCore.Testing
                     new SkillRequest
                     {
                         Session = session ?? new Session { New = true, SessionId = newSessionId },
-                        Request = new IntentRequest { Intent = new Intent { Name = intentName } },
+                        Request = new IntentRequest { Intent = new Intent { Name = intentName, Slots = slots} },
                         Context = context
                     }, lambdaContext);
 
@@ -69,11 +73,11 @@ namespace AlexaCore.Testing
 
         }
 
-        public AlexaCoreTestRunner RunAgain(string intentName)
+        public AlexaCoreTestRunner RunAgain(string intentName, Dictionary<string, Slot> slots = null)
         {
             ValidateHasRun();
 
-            return RunInitialFunction(intentName, Session.SessionId, Session);
+            return RunInitialFunction(intentName, Session.SessionId, Session, slots: slots);
         }
 
         public AlexaCoreTestRunner VerifyIntentIsLoaded(string intentName)
@@ -83,13 +87,31 @@ namespace AlexaCore.Testing
             return this;
         }
 
-        public AlexaCoreTestRunner VerifyOutputSpeech()
+        public AlexaCoreTestRunner VerifyOutputSpeechExists()
         {
             ValidateHasRun();
 
             Assert.That(SkillResponse.Response.OutputSpeech, Is.Not.Null);
 
             return this;
+        }
+
+        public AlexaCoreTestRunner VerifyOutputSpeechValue(string value)
+        {
+            var text = GetOutputSpeechValue();
+
+            Assert.That(text, Is.EqualTo(value));
+
+            return this;
+        }
+
+        public string GetOutputSpeechValue()
+        {
+            ValidateHasRun();
+
+            var text = (PlainTextOutputSpeech)SkillResponse.Response.OutputSpeech;
+
+            return text.Text;
         }
 
         private void ValidateHasRun()

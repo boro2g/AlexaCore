@@ -4,6 +4,7 @@ using System.Linq;
 using Alexa.NET;
 using Alexa.NET.Request;
 using Alexa.NET.Response;
+using AlexaCore.Extensions;
 
 namespace AlexaCore.Intents
 {
@@ -45,7 +46,7 @@ namespace AlexaCore.Intents
 
 		protected virtual string MissingSlotsText()
 		{
-			return "Your request seems to be missing some information - please add a bit more info.";
+			return $"Your request seems to be missing some information. Expected slots are: {RequiredSlots.JoinStringList()}.";
 		}
 
 		private bool ValidateSlots(Dictionary<string, Slot> slots)
