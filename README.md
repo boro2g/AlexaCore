@@ -71,12 +71,19 @@ These get automatically populated with each intent name as intents get run. If y
 
 2. **Parameters.InputQueue**
 Imagine you hold a list of names in your function and have 2 intents, one to add new names and one to remove names. If you store each time someone adds a name in the InputQueue e.g. `Parameters.InputQueue.Enqueue(new InputItem("NewPerson", new[] {"Add"}));`. 
-
 When you come to return all the names you can query the queue's entries based off the **Tag: Add** e.g. `Parameters.InputQueue.Entries().Where(a => a.Tags.Contains("Add")).Select(a => a.Value)`
 
 3. **Parameters.ApplicationParameters**
 If you need to persist dynamic parameters in the function you can store data in the ApplicationParameters. An example would be when the function starts you lookup a key in a database and then persist the id throughout the rest of the function calls.
-
 To store the data you could call: `Parameters.ApplicationParameters.Enqueue(new ApplicationParameter("Key", "Value"))` and then to retrieve the data you could call: `Parameters.ApplicationParameters.Find(a => a.Name == "Key")?.Value`
 
-Updating parameters is possible, each queue has an `Update` method available.
+Updating parameters or values is possible - each queue has an `Update` method available.
+
+# Chaining intents:
+Todo
+
+# Default intents:
+Todo
+
+# Extensions:
+Todo
