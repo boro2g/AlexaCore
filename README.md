@@ -80,7 +80,18 @@ To store the data you could call: `Parameters.ApplicationParameters.Enqueue(new 
 Updating parameters or values is possible - each queue has an `Update` method available.
 
 # Chaining intents:
-A relatively common scenario is to chain intents. 
+A relatively common scenario is to chain intents. Imagine you load an intent which prompts the user for confirmation: 
+_I'm going to do something. Are you ok with that?_
+_Yes / no_
+Via `IntentWithResponse` and `IntentAsResponse` this link can be achieved. See `QuestionNeedingResponseIntent` in the test project as an example. You can specify which responses are considered valid - in this example yes and no. If an invalid response is given an error is returned indicating which responses are considered valid.
+
+Within the Response method you can pull the value back from counterpart intents. E.g. 
+```csharp
+private SkillResponse ExternalResponse(string arg)
+{
+    return AlexaContext.IntentFactory.GetIntent("LaunchIntent").GetResponse(Slots);
+}
+```
 
 # Default intents:
 Todo
