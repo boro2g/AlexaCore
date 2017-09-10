@@ -80,7 +80,7 @@ To store the data you could call: `Parameters.ApplicationParameters.Enqueue(new 
 Updating parameters or values is possible - each queue has an `Update` method available.
 
 # Chaining intents:
-Todo
+A relatively common scenario is to chain intents. 
 
 # Default intents:
 Todo
