@@ -96,7 +96,7 @@ private SkillResponse ExternalResponse(string arg)
 # Default intents:
 The core function code registers some default Intents: `DefaultStopIntent`,`DefaultCancelIntent` and optionally `DefaultDebugIntent`. You can trigger the `DefaultDebugIntent` to be included via the IntentFactory: `IncludeDefaultDebugIntent`. You can also override the cancel and stop intent's or register your own. 
 
-To replace with your own you simply need to create Intents that are named `"AMAZON.CancelIntent"` or `"AMAZON.StopIntent"` and register them.
+To replace with your own you simply need to create Intents that are configured with IntentName of `"AMAZON.CancelIntent"` or `"AMAZON.StopIntent"` and register them.
 
 # Extensions:
 Some IEnumerable extensions are available to: `PickRandom`, `Shuffle` and `JoinStringList`. The latter is useful for pretty printing lists of strings. The output for an array `new[] { "1","2","3" }` will be: `"1, 2 and 3"`
