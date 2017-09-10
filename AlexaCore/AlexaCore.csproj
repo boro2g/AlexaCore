@@ -8,6 +8,7 @@
 	  <Authors>boro2g</Authors>
 		<Description>Some helpers for streamlining Alexa C# Lambda functions</Description>
 	  <PackageTags>alexa lambda</PackageTags>
+	  <PackageProjectUrl>https://github.com/boro2g/AlexaCore</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -38,5 +38,7 @@ namespace AlexaCore.Tests
                 .RunTest("LaunchIntent")
                 .VerifySessionApplicationParameters("name", "value");
         }
+
+        //todo - add test showing parameters getting updated
     }
 }

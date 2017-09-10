@@ -10,6 +10,10 @@ namespace AlexaCore.Tests.Function
     {
         protected override List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters)
         {
+            //either register explicitly 
+            //return new List<AlexaIntent> {new HelpIntent(intentParameters), new LaunchIntent(intentParameters)};
+
+            //or use reflection to find all your intents based of a set of source assemblies
             return IntentFinder.FindIntents(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly },
                 intentParameters).ToList();
         }
