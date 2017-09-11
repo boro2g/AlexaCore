@@ -16,7 +16,9 @@ namespace AlexaCore
 
 	    public string UserAccessToken => InputSession?.User?.AccessToken;
 
-	    private Session InputSession { get; }
+		public string UserId => InputSession?.User?.UserId;
+
+		private Session InputSession { get; }
 
 	    public IntentParameters(ILambdaLogger logger, Session inputSession)
 	    {
