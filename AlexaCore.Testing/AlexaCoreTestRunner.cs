@@ -148,6 +148,27 @@ namespace AlexaCore.Testing
             return this;
         }
 
+        public AlexaCoreTestRunner VerifyTextMatchesAnotherIntentResponse(string intentName, Dictionary<string, Slot> slots = null)
+        {
+            if (slots == null)
+            {
+                slots = new Dictionary<string, Slot>();
+            }
+
+            var text = GetOutputSpeechValue();
+            
+            var counterPartIntent = AlexaContext.IntentFactory.GetIntent(intentName);
+
+            Assert.That(counterPartIntent, Is.Not.Null);
+
+            var counterPartText = ((PlainTextOutputSpeech)counterPartIntent.GetResponse(slots).Response
+                .OutputSpeech).Text;
+
+            Assert.That(text, Is.EqualTo(counterPartText));
+
+            return this;
+        }
+
         public AlexaCoreTestRunner VerifySessionApplicationParameters(string key, string value)
         {
             var sessionKey = "_PersistentQueue_Parameters";
