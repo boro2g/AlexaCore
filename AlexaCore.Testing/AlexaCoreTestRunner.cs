@@ -107,17 +107,28 @@ namespace AlexaCore.Testing
             return this;
         }
 
-        public AlexaCoreTestRunner VerifyOutputSpeechValueContains(string value, bool ignoreCase = false)
+        public AlexaCoreTestRunner VerifyOutputSpeechValueContains(bool ignoreCase = false, params string[] values)
         {
             var text = GetOutputSpeechValue();
 
-            if (ignoreCase)
+            if (!values.Any())
             {
-                text = text.ToLower();
-                value = value.ToLower();
+                values = new string[0];
             }
 
-            Assert.That(text.Contains(value), Is.True, $"Output text doesn't contain {value}");
+            foreach (var value in values)
+            {
+                string valueToCheck = value;
+
+                if (ignoreCase)
+                {
+                    text = text.ToLower();
+
+                    valueToCheck = value.ToLower();
+                }
+
+                Assert.That(text.Contains(valueToCheck), Is.True, $"Output text doesn't contain {value}");
+            }
 
             return this;
         }
