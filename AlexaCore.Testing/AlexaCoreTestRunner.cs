@@ -107,6 +107,21 @@ namespace AlexaCore.Testing
             return this;
         }
 
+        public AlexaCoreTestRunner VerifyOutputSpeechValueContains(string value, bool ignoreCase = false)
+        {
+            var text = GetOutputSpeechValue();
+
+            if (ignoreCase)
+            {
+                text = text.ToLower();
+                value = value.ToLower();
+            }
+
+            Assert.That(text.Contains(value), Is.True, $"Output text doesn't contain {value}");
+
+            return this;
+        }
+
         public string GetOutputSpeechValue()
         {
             ValidateHasRun();
