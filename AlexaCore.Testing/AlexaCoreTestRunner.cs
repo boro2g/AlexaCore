@@ -107,6 +107,32 @@ namespace AlexaCore.Testing
             return this as T;
         }
 
+        public AlexaCoreTestRunner VerifyOutputSpeechValueContains(bool ignoreCase = false, params string[] values)
+        {
+            var text = GetOutputSpeechValue();
+
+            if (!values.Any())
+            {
+                values = new string[0];
+            }
+
+            foreach (var value in values)
+            {
+                string valueToCheck = value;
+
+                if (ignoreCase)
+                {
+                    text = text.ToLower();
+
+                    valueToCheck = value.ToLower();
+                }
+
+                Assert.That(text.Contains(valueToCheck), Is.True, $"Output text doesn't contain {value}");
+            }
+
+            return this;
+        }
+
         public string GetOutputSpeechValue()
         {
             ValidateHasRun();
@@ -133,7 +159,7 @@ namespace AlexaCore.Testing
             return this as T;
         }
 
-        public T VerifySessionApplicationParameters(string key, string value)
+        public AlexaCoreTestRunner VerifySessionApplicationParameters(string key, string value)
         {
             var sessionKey = "_PersistentQueue_Parameters";
 
