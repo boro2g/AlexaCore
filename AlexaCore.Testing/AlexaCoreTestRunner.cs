@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace AlexaCore.Testing
 {
-    public abstract class AlexaCoreTestRunner
+    public abstract class AlexaCoreTestRunner<T> where T : class
     {
         private bool _hasRun;
 
@@ -38,7 +38,7 @@ namespace AlexaCore.Testing
 
         public abstract AlexaFunction BuildFunction();
         
-        public AlexaCoreTestRunner RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null)
+        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null) 
         {
             var lambdaContext = new TestLambdaContext
             {
@@ -67,44 +67,44 @@ namespace AlexaCore.Testing
 
             _hasRun = true;
 
-            return this;
+            return this as T;
         }
 
         protected virtual void RegisterTypes()
         {
 
         }
-
-        public AlexaCoreTestRunner RunAgain(string intentName, Dictionary<string, Slot> slots = null)
+        
+        public T RunAgain(string intentName, Dictionary<string, Slot> slots = null)
         {
             ValidateHasRun();
 
             return RunInitialFunction(intentName, Session.SessionId, Session, slots: slots);
         }
 
-        public AlexaCoreTestRunner VerifyIntentIsLoaded(string intentName)
+        public T VerifyIntentIsLoaded(string intentName)
         {
             Assert.That(AlexaContext.IntentFactory.RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
 
-            return this;
+            return this as T;
         }
 
-        public AlexaCoreTestRunner VerifyOutputSpeechExists()
+        public T VerifyOutputSpeechExists()
         {
             ValidateHasRun();
 
             Assert.That(SkillResponse.Response.OutputSpeech, Is.Not.Null);
 
-            return this;
+            return this as T;
         }
 
-        public AlexaCoreTestRunner VerifyOutputSpeechValue(string value)
+        public T VerifyOutputSpeechValue(string value)
         {
             var text = GetOutputSpeechValue();
 
             Assert.That(text, Is.EqualTo(value));
 
-            return this;
+            return this as T;
         }
 
         public string GetOutputSpeechValue()
@@ -124,16 +124,16 @@ namespace AlexaCore.Testing
             }
         }
 
-        public AlexaCoreTestRunner DumpOutputSpeech(Action<string> logger)
+        public T DumpOutputSpeech(Action<string> logger)
         {
             ValidateHasRun();
 
             logger(SkillResponse.Response.OutputSpeech.ToString());
 
-            return this;
+            return this as T;
         }
 
-        public AlexaCoreTestRunner VerifySessionApplicationParameters(string key, string value)
+        public T VerifySessionApplicationParameters(string key, string value)
         {
             var sessionKey = "_PersistentQueue_Parameters";
 
@@ -145,10 +145,10 @@ namespace AlexaCore.Testing
 
             Assert.That(matchingParameter.Value, Is.EqualTo(value), $"Key found in '{sessionKey}' ({key}) has value '{matchingParameter.Value}'. Expected: '{value}'");
 
-            return this;
+            return this as T;
         }
 
-        public AlexaCoreTestRunner VerifySessionCommandQueue(string key)
+        public T VerifySessionCommandQueue(string key)
         {
             var sessionKey = "_PersistentQueue_Commands";
 
@@ -158,10 +158,10 @@ namespace AlexaCore.Testing
 
             Assert.That(matchingParameter, Is.Not.Null, $"No key found in '{sessionKey}' with key '{key}'");
 
-            return this;
+            return this as T;
         }
 
-        public AlexaCoreTestRunner VerifySessionInputQueue(string value, string[] tags = null)
+        public T VerifySessionInputQueue(string value, string[] tags = null)
         {
             var sessionKey = "_PersistentQueue_Inputs";
 
@@ -183,7 +183,7 @@ namespace AlexaCore.Testing
                 }
             }
 
-            return this;
+            return this as T;
         }
 
         protected List<T> GetSessionParameter<T>(string sessionKey)

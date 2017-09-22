@@ -2,7 +2,7 @@
 
 namespace AlexaCore.Tests.Function
 {
-    class TestFunctionTestRunner : AlexaCoreTestRunner
+    class TestFunctionTestRunner : AlexaCoreTestRunner<TestFunctionTestRunner>
     {
         private bool _performRegisterTypes;
 
@@ -13,10 +13,15 @@ namespace AlexaCore.Tests.Function
             return new TestFunction();
         }
 
-        public AlexaCoreTestRunner PerformRegisterTypes(bool value)
+        public TestFunctionTestRunner PerformRegisterTypes(bool value)
         {
             _performRegisterTypes = value;
 
+            return this;
+        }
+
+        public TestFunctionTestRunner DoSomethingSpecificToThisImplementation()
+        {
             return this;
         }
 
