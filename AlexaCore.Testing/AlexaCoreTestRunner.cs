@@ -212,20 +212,20 @@ namespace AlexaCore.Testing
             return this as T;
         }
 
-        protected List<T> GetSessionParameter<T>(string sessionKey)
+        protected List<TSessionParam> GetSessionParameter<TSessionParam>(string sessionKey)
         {
             ValidateHasRun();
 
-            List<T> parameters = (List<T>)SkillResponse.SessionAttributes[sessionKey];
+            List<TSessionParam> parameters = (List<TSessionParam>)SkillResponse.SessionAttributes[sessionKey];
 
             return parameters;
         }
 
-        public T Resolve<T>(string key)
+        public TType Resolve<TType>(string key)
         {
             ValidateHasRun();
 
-            return AlexaContext.Container.Resolve<T>(key);
+            return AlexaContext.Container.Resolve<TType>(key);
         }
     }
 }
