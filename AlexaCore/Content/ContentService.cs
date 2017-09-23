@@ -58,9 +58,9 @@ namespace AlexaCore.Content
 
             try
             {
-                using (var _httpClient = BuildClient())
+                using (var httpClient = BuildClient())
                 {
-                    _httpClient.Timeout = Timeout();
+                    httpClient.Timeout = Timeout();
 
                     string requestUri = RequestUri(intentKey, userId);
 
@@ -74,7 +74,7 @@ namespace AlexaCore.Content
                             String.Join(";", cookies.Select(a => a.ToString())));
                     }
 
-                    var result = _httpClient.SendAsync(message).Result;
+                    var result = httpClient.SendAsync(message).Result;
 
                     result.EnsureSuccessStatusCode();
 

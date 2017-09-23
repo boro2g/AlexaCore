@@ -127,7 +127,7 @@ namespace AlexaCore.Testing
                     valueToCheck = value.ToLower();
                 }
 
-                Assert.That(text.Contains(valueToCheck), Is.True, $"Output text doesn't contain {value}");
+                Assert.That(text.Contains(valueToCheck), Is.True, $"Output text doesn't contain {value}. Output text is: {text}");
             }
 
             return this as T;
