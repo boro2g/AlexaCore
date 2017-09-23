@@ -30,6 +30,9 @@ namespace AlexaCore.Tests.Content
             var result = contentService.LoadAndFormatContent("HelpIntent", "default text");
 
             Console.WriteLine(result);
+
+            //todo - need some tests around cookies and persistance
+            //todo - need to actually test it working
         }
     }
 }
