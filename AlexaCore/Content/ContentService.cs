@@ -2,86 +2,104 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using AlexaCore.Web;
 using Newtonsoft.Json;
 
 namespace AlexaCore.Content
 {
     public interface IContentService<T> where T : IIntentContent
     {
-        T LoadContent(string key, string defaultText, string userId, IEnumerable<CookieValue> cookies,
-            out IEnumerable<CookieValue> requestCookies);
-
         string LoadAndFormatContent(string key, string defaultText, params string[] parameters);
     }
 
     public abstract class ContentService<T> : IContentService<T> where T : IIntentContent
     {
-        private const string AspNetSessionIdKey = "ASP.NET_SessionId";
+        private readonly PersistentQueue<ApplicationParameter> _applicationParameters;
+        private readonly string _userId;
 
-        public abstract string BaseAddress { get; }
+        protected ContentService(PersistentQueue<ApplicationParameter> applicationParameters, string userId)
+        {
+            _applicationParameters = applicationParameters;
+            _userId = userId;
+        }
 
-        public abstract string RequestUri(string key, string userId);
+        public virtual IHttpClient BuildClient()
+        {
+            return new AlexaHttpClient(new HttpClientHandler {UseCookies = false}) { BaseAddress = BaseAddress, Timeout = Timeout() };
+        }
+
+        public abstract Uri BaseAddress { get; }
+
+        public abstract string RequestUri(string intentKey, string userId);
 
         public virtual TimeSpan Timeout()
         {
             return TimeSpan.FromSeconds(1);
         }
 
-        public T LoadContent(string key, string defaultText, string userId,
+        public virtual IEnumerable<string> CookiesToPersist()
+        {
+            yield return "ASP.NET_SessionId";
+        }
+
+        public virtual HttpRequestMessage BuildRequestMessage(string requestUri)
+        {
+            return new HttpRequestMessage(HttpMethod.Get, requestUri);
+        }
+
+        public T LoadContent(string intentKey, string defaultText, string userId,
             IEnumerable<CookieValue> cookies, out IEnumerable<CookieValue> requestCookies) 
         {
-            var sessionCookie = cookies?.FirstOrDefault(a => a.Key == AspNetSessionIdKey);
+            var cookiesToPersist = cookies?.Where(a => CookiesToPersist().Contains(a.Key));
 
-            var baseAddress = new Uri(BaseAddress);
+            var baseAddress = BaseAddress;
 
             List<CookieValue> cookieStrings = new List<CookieValue>();
 
             try
             {
-                using (var handler = new HttpClientHandler { UseCookies = false })
+                using (var _httpClient = BuildClient())
                 {
-                    using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+                    _httpClient.Timeout = Timeout();
+
+                    string requestUri = RequestUri(intentKey, userId);
+
+                    Console.WriteLine($"Loading content from: {baseAddress}{requestUri.TrimStart('/')}");
+
+                    var message = BuildRequestMessage(requestUri);
+
+                    if (cookies.Any())
                     {
-                        client.Timeout = Timeout();
+                        message.Headers.TryAddWithoutValidation("Cookie",
+                            String.Join(";", cookies.Select(a => a.ToString())));
+                    }
 
-                        string requestUri = RequestUri(key, userId);
-                        
-                        Console.WriteLine($"Loading content from: {baseAddress}{requestUri}");
+                    var result = _httpClient.SendAsync(message).Result;
 
-                        var message = new HttpRequestMessage(HttpMethod.Get, requestUri);
+                    result.EnsureSuccessStatusCode();
 
-                        if (cookies.Any())
+                    var cookieHeader = result.Headers.FirstOrDefault(a =>
+                        String.Equals(a.Key, "set-cookie", StringComparison.OrdinalIgnoreCase)).Value;
+
+                    if (cookieHeader != null)
+                    {
+                        foreach (var cookieValue in cookieHeader)
                         {
-                            message.Headers.TryAddWithoutValidation("Cookie", String.Join(";", cookies.Select(a => a.ToString())));
-                        }
+                            var parts = cookieValue.Split(';');
 
-                        var result = client.SendAsync(message).Result;
-
-                        result.EnsureSuccessStatusCode();
-
-                        var cookieHeader = result.Headers.FirstOrDefault(a =>
-                            String.Equals(a.Key, "set-cookie", StringComparison.OrdinalIgnoreCase)).Value;
-
-                        if (cookieHeader != null)
-                        {
-                            foreach (var cookieValue in cookieHeader)
+                            if (parts.Length > 0)
                             {
-                                var parts = cookieValue.Split(';');
-
-                                if (parts.Length > 0)
-                                {
-                                    cookieStrings.Add(CookieValueParser.ParseCookie(parts[0]));
-                                }
+                                cookieStrings.Add(CookieValueParser.ParseCookie(parts[0]));
                             }
                         }
-
-                        if (cookieStrings.Count > 0 && !SessionCookieExists(cookieStrings) && sessionCookie != null)
-                        {
-                            cookieStrings.Add(sessionCookie);
-                        }
-
-                        return (T)(object)JsonConvert.DeserializeObject<IntentContent>(result.Content.ReadAsStringAsync().Result);
                     }
+
+                    cookieStrings.AddRange(cookiesToPersist?.Where(a =>
+                        !cookieStrings.Select(b => b.Key).Contains(a.Key)));
+
+                    var responseText = result.Content.ReadAsStringAsync().Result;
+
+                    return JsonConvert.DeserializeObject<T>(responseText);
                 }
             }
             catch (Exception e)
@@ -90,7 +108,7 @@ namespace AlexaCore.Content
 
                 Console.WriteLine(e.StackTrace);
 
-                return (T)(object) new IntentContent { Content = defaultText, Default = true };
+                return (T) (object) new IntentContent {Content = defaultText, Default = true};
             }
             finally
             {
@@ -100,18 +118,32 @@ namespace AlexaCore.Content
 
         public string LoadAndFormatContent(string key, string defaultText, params string[] parameters)
         {
+            string cookieKey = "__cookies";
 
-            //set keys in application parameters?
-            //where best to get application parameters from?
-            //how to resolve the IContentService?
+            var cookieValues = _applicationParameters.GetValue(cookieKey);
+
+            List<CookieValue> cookieList = new List<CookieValue>();
+
+            if (!String.IsNullOrWhiteSpace(cookieValues))
+            {
+                cookieList = JsonConvert.DeserializeObject<List<CookieValue>>(cookieValues);
+            }
+
+            var contentResults = LoadContent(key, defaultText, _userId, cookieList, out var responseCookies)?.Content;
+
+            if (responseCookies != null && responseCookies.Any())
+            {
+                _applicationParameters.AddOrUpdateValue(cookieKey, JsonConvert.SerializeObject(responseCookies));
+            }
+            
+            if (String.IsNullOrWhiteSpace(contentResults))
+            {
+                return String.Format(defaultText, parameters);
+            }
+
+            return String.Format(contentResults, parameters);
+           
             //is T best at interface or method level?
-
-            throw new NotImplementedException();
-        }
-
-        private static bool SessionCookieExists(List<CookieValue> cookieStrings)
-        {
-            return cookieStrings.Any(a => a.Key == AspNetSessionIdKey);
         }
     }
 }
