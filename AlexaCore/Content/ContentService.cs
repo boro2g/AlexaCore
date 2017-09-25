@@ -42,6 +42,11 @@ namespace AlexaCore.Content
             yield return "ASP.NET_SessionId";
         }
 
+        protected virtual T ProcessResult(T result)
+        {
+            return result;
+        }
+
         public virtual HttpRequestMessage BuildRequestMessage(string requestUri)
         {
             return new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -99,7 +104,7 @@ namespace AlexaCore.Content
 
                     var responseText = result.Content.ReadAsStringAsync().Result;
 
-                    return JsonConvert.DeserializeObject<T>(responseText);
+                    return ProcessResult(JsonConvert.DeserializeObject<T>(responseText));
                 }
             }
             catch (Exception e)
@@ -108,7 +113,7 @@ namespace AlexaCore.Content
 
                 Console.WriteLine(e.StackTrace);
 
-                return (T) (object) new IntentContent {Content = defaultText, Default = true};
+                return ProcessResult((T) (object) new IntentContent {Content = defaultText, Default = true});
             }
             finally
             {
@@ -142,8 +147,6 @@ namespace AlexaCore.Content
             }
 
             return String.Format(contentResults, parameters);
-           
-            //is T best at interface or method level?
         }
     }
 }
