@@ -133,6 +133,23 @@ namespace AlexaCore.Testing
             return this as T;
         }
 
+        public T VerifyTextMatchesAnotherIntentResponse(string counterPartIntentName, Dictionary<string, Slot> counterPartIntentSlots = null)
+        {
+            if (counterPartIntentSlots == null)
+            {
+                counterPartIntentSlots = new Dictionary<string, Slot>();
+            }
+
+            var text = GetOutputSpeechValue();
+
+            var counterPartText = ((PlainTextOutputSpeech)AlexaContext.IntentFactory.GetIntent(counterPartIntentName)
+                .GetResponse(counterPartIntentSlots).Response.OutputSpeech).Text;
+
+            Assert.That(text, Is.EqualTo(counterPartText));
+
+            return this as T;
+        }
+
         public string GetOutputSpeechValue()
         {
             ValidateHasRun();
