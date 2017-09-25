@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AlexaCore.Content;
 using AlexaCore.Web;
 
@@ -21,8 +22,14 @@ namespace AlexaCore.Tests.Content
 
         public override Uri BaseAddress => new Uri("http://alexacontent.boro2g.co.uk");
 
-        public override string RequestUri(string intentKey, string userId)
+        public override string RequestUri(string intentKey, string userId, RequestParameters additionalRequestParameters)
         {
+            if (additionalRequestParameters.Parameters.Any())
+            {
+                return
+                    $"/easyTea/intents/{intentKey}?j=1&userId={userId}&{String.Join("&", additionalRequestParameters.Parameters.Select(a => $"{a.Key}={a.Value}"))}";
+            }
+
             return $"/easyTea/intents/{intentKey}?j=1&userId={userId}";
         }
     }

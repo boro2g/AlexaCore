@@ -9,7 +9,7 @@ namespace AlexaCore.Content
 {
     public interface IContentService<T> where T : IIntentContent
     {
-        string LoadAndFormatContent(string key, string defaultText, params string[] parameters);
+        string LoadAndFormatContent(string key, string defaultText, RequestParameters additionalRequestParameters, params string[] parameters);
     }
 
     public abstract class ContentService<T> : IContentService<T> where T : IIntentContent
@@ -30,7 +30,7 @@ namespace AlexaCore.Content
 
         public abstract Uri BaseAddress { get; }
 
-        public abstract string RequestUri(string intentKey, string userId);
+        public abstract string RequestUri(string intentKey, string userId, RequestParameters additionalRequestParameters);
 
         public virtual TimeSpan Timeout()
         {
@@ -47,14 +47,18 @@ namespace AlexaCore.Content
             return result;
         }
 
-        public virtual HttpRequestMessage BuildRequestMessage(string requestUri)
+        public virtual HttpRequestMessage BuildRequestMessage(string requestUri, RequestParameters requestParameters)
         {
             return new HttpRequestMessage(HttpMethod.Get, requestUri);
         }
 
-        public T LoadContent(string intentKey, string defaultText, string userId,
-            IEnumerable<CookieValue> cookies, out IEnumerable<CookieValue> requestCookies) 
+        public T LoadContent(string intentKey, string defaultText, string userId, RequestParameters additionalRequestParameters, IEnumerable<CookieValue> cookies, out IEnumerable<CookieValue> requestCookies) 
         {
+            if (additionalRequestParameters == null)
+            {
+                additionalRequestParameters = new RequestParameters();
+            }
+
             var cookiesToPersist = cookies?.Where(a => CookiesToPersist().Contains(a.Key));
 
             var baseAddress = BaseAddress;
@@ -67,11 +71,11 @@ namespace AlexaCore.Content
                 {
                     httpClient.Timeout = Timeout();
 
-                    string requestUri = RequestUri(intentKey, userId);
+                    string requestUri = RequestUri(intentKey, userId, additionalRequestParameters);
 
                     Console.WriteLine($"Loading content from: {baseAddress}{requestUri.TrimStart('/')}");
 
-                    var message = BuildRequestMessage(requestUri);
+                    var message = BuildRequestMessage(requestUri, additionalRequestParameters);
 
                     if (cookies.Any())
                     {
@@ -121,7 +125,7 @@ namespace AlexaCore.Content
             }
         }
 
-        public string LoadAndFormatContent(string key, string defaultText, params string[] parameters)
+        public string LoadAndFormatContent(string key, string defaultText, RequestParameters additionalRequestParameters = null, params string[] parameters)
         {
             string cookieKey = "__cookies";
 
@@ -134,7 +138,7 @@ namespace AlexaCore.Content
                 cookieList = JsonConvert.DeserializeObject<List<CookieValue>>(cookieValues);
             }
 
-            var contentResults = LoadContent(key, defaultText, _userId, cookieList, out var responseCookies)?.Content;
+            var contentResults = LoadContent(key, defaultText, _userId, additionalRequestParameters, cookieList, out var responseCookies)?.Content;
 
             if (responseCookies != null && responseCookies.Any())
             {

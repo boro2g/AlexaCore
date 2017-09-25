@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net.Http;
 using Alexa.NET.Request;
 using AlexaCore.Content;
+using AlexaCore.Web;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -25,6 +27,37 @@ namespace AlexaCore.Tests.Content
             var result = contentService.LoadAndFormatContent("HelpIntent", "default text");
 
             Assert.That(result, Is.EqualTo(responseText));
+        }
+
+        [Test]
+        public void WhenContentIsRequested_CorrectUrlIsRequested()
+        {
+            Assert.That(RunRequestWithParameters(), Is.EqualTo("/easyTea/intents/HelpIntent?j=1&userId=userId"));
+
+            Assert.That(
+                RunRequestWithParameters(new RequestParameters
+                {
+                    Parameters = new[] {new RequestParameter {Key = "a", Value = "b"}}
+                }), Is.EqualTo("/easyTea/intents/HelpIntent?j=1&userId=userId&a=b"));
+        }
+
+        private static string RunRequestWithParameters(RequestParameters requestParameters = null)
+        {
+            var queue = BuildQueue();
+
+            var mockHttpClient = new Mock<IHttpClient>();
+
+            HttpRequestMessage message = null;
+
+            mockHttpClient.Setup(a => a.SendAsync(It.IsAny<HttpRequestMessage>()))
+                .Callback<HttpRequestMessage>(a => message = a);
+
+            var contentService = new TestContentService(queue, "userId", mockHttpClient.Object);
+
+            contentService.LoadAndFormatContent("HelpIntent", "default text", requestParameters);
+
+            var requestUri = message.RequestUri.ToString();
+            return requestUri;
         }
 
         [Test]
