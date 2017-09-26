@@ -37,7 +37,7 @@ namespace AlexaCore.Tests.Content
             Assert.That(
                 RunRequestWithParameters(new RequestParameters
                 {
-                    Parameters = new[] {new RequestParameter {Key = "a", Value = "b"}}
+                    Parameters = new[] {new RequestParameter("a","b")}
                 }), Is.EqualTo("/easyTea/intents/HelpIntent?j=1&userId=userId&a=b"));
         }
 
