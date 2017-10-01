@@ -19,9 +19,7 @@ namespace AlexaCore.Intents
 
 			if (lastCommand != null && lastCommand.ExpectsResponse)
 			{
-				var intent = AlexaContext.IntentFactory.Intents(Parameters)[lastCommand.IntentName] as IntentWithResponse;
-				
-				if (intent != null)
+			    if (AlexaContext.IntentFactory.Intents(Parameters)[lastCommand.IntentName] is IntentWithResponse intent)
 				{
 					Parameters.Logger.LogLine($"IntentAsResponse: {intent.IntentName}");
 
@@ -29,14 +27,14 @@ namespace AlexaCore.Intents
 
 					if (matchedResponse != null)
 					{
-						return matchedResponse.Action(matchedResponse.ParameterValue);
+						return matchedResponse.Action();
 					}
 
-					return BuildResponse(new PlainTextOutputSpeech { Text = intent.PossibleResponsesAsText() });
+					return Tell(intent.PossibleResponsesAsText());
 				}
 			}
 
-			return AlexaContext.IntentFactory.HelpIntent().GetResponse(slots);
+			return AlexaContext.IntentFactory.HelpIntent(Parameters).GetResponse(slots);
 		}
 
 		protected virtual CommandDefinition SelectLastCommand()

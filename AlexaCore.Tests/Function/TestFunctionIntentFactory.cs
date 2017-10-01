@@ -23,6 +23,11 @@ namespace AlexaCore.Tests.Function
             return new LaunchIntent(intentParameters);
         }
 
+        public override AlexaIntent HelpIntent(IntentParameters intentParameters)
+        {
+            return new HelpIntent(intentParameters);
+        }
+
         public override bool IncludeDefaultDebugIntent()
         {
             return true;

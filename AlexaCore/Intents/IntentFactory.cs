@@ -51,7 +51,9 @@ namespace AlexaCore.Intents
 
 	    public abstract AlexaIntent LaunchIntent(IntentParameters intentParameters);
 
-	    public AlexaIntent GetIntent(string intentName)
+        public abstract AlexaIntent HelpIntent(IntentParameters intentParameters);
+
+        public AlexaIntent GetIntent(string intentName)
 	    {
 		    if (_intents != null && _intents.ContainsKey(intentName))
 		    {
@@ -59,11 +61,6 @@ namespace AlexaCore.Intents
 		    }
 
 		    return null;
-	    }
-
-	    public virtual AlexaIntent HelpIntent()
-	    {
-		    return _intents[AlexaContext.IntentNames.HelpIntent];
 	    }
 
         public virtual bool IncludeDefaultDebugIntent()

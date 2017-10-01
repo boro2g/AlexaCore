@@ -86,7 +86,7 @@ namespace AlexaCore
 			    }
 			    else
 			    {
-				    intentToRun = _intentFactory.HelpIntent();
+				    intentToRun = _intentFactory.HelpIntent(parameters);
 			    }
 		    }
 
