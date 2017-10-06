@@ -51,7 +51,7 @@ namespace AlexaCore.Intents
 
 	    public abstract AlexaIntent LaunchIntent(IntentParameters intentParameters);
 
-        public abstract AlexaIntent HelpIntent(IntentParameters intentParameters);
+        public abstract AlexaHelpIntent HelpIntent(IntentParameters intentParameters);
 
         public AlexaIntent GetIntent(string intentName)
 	    {

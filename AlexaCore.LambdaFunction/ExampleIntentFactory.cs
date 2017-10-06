@@ -1,19 +1,15 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AlexaCore.Intents;
-using AlexaCore.Tests.Function.Intents;
+using AlexaCore.LambdaFunction.Intents;
 
-namespace AlexaCore.Tests.Function
+namespace AlexaCore.LambdaFunction
 {
-    class TestFunctionIntentFactory : IntentFactory
+    public class ExampleIntentFactory : IntentFactory
     {
         protected override List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters)
         {
-            //either register explicitly 
-            //return new List<AlexaIntent> {new HelpIntent(intentParameters), new LaunchIntent(intentParameters)};
-
-            //or use reflection to find all your intents based of a set of source assemblies
             return IntentFinder.FindIntents(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly },
                 intentParameters).ToList();
         }
@@ -26,11 +22,6 @@ namespace AlexaCore.Tests.Function
         public override AlexaHelpIntent HelpIntent(IntentParameters intentParameters)
         {
             return new HelpIntent(intentParameters);
-        }
-
-        public override bool IncludeDefaultDebugIntent()
-        {
-            return true;
         }
     }
 }
