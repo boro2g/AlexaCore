@@ -32,13 +32,13 @@ namespace AlexaCore.Tests.Content
         [Test]
         public void WhenContentIsRequested_CorrectUrlIsRequested()
         {
-            Assert.That(RunRequestWithParameters(), Is.EqualTo("/easyTea/intents/HelpIntent?j=1&userId=userId"));
+            Assert.That(RunRequestWithParameters(), Is.EqualTo("/url/intents/HelpIntent?j=1&userId=userId"));
 
             Assert.That(
                 RunRequestWithParameters(new RequestParameters
                 {
                     Parameters = new[] {new RequestParameter("a","b")}
-                }), Is.EqualTo("/easyTea/intents/HelpIntent?j=1&userId=userId&a=b"));
+                }), Is.EqualTo("/url/intents/HelpIntent?j=1&userId=userId&a=b"));
         }
 
         private static string RunRequestWithParameters(RequestParameters requestParameters = null)
