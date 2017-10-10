@@ -104,9 +104,13 @@ Some IEnumerable extensions are available to: `PickRandom`, `Shuffle` and `JoinS
 # Global properties ala an IOC Container:
 You can register global properties much like you would with an IOC container. In your implementation of **AlexaFunction** you can setup any registrations:
 ```csharp
-protected override void FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+protected override SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
 {
     AlexaContext.Container.RegisterType("key", () => new GlobalTypeOrDataStore(new AmazonDynamoDBClient()));
+    
+    //If you return a SkillResponse here every intent will be skipped and this response gets returned everytime. 
+    //Useful if you need to ensure something is initialized before every function.
+    return null;
 }
 ```
 Which can then be resolved anywhere else in your code via:
