@@ -67,7 +67,12 @@ namespace AlexaCore.Testing
 
             _hasRun = true;
 
-            return this as T;
+            return Convert(this);
+        }
+
+        public virtual T Convert(AlexaCoreTestRunner<T> alexaCoreTestRunner)
+        {
+            return alexaCoreTestRunner as T;
         }
 
         protected virtual void RegisterTypes()
@@ -86,7 +91,7 @@ namespace AlexaCore.Testing
         {
             Assert.That(AlexaContext.IntentFactory.RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifyOutputSpeechExists()
@@ -95,7 +100,7 @@ namespace AlexaCore.Testing
 
             Assert.That(SkillResponse.Response.OutputSpeech, Is.Not.Null);
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifyOutputSpeechValue(string value)
@@ -104,7 +109,7 @@ namespace AlexaCore.Testing
 
             Assert.That(text, Is.EqualTo(value));
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifyOutputSpeechValueContains(bool ignoreCase = false, params string[] values)
@@ -130,7 +135,7 @@ namespace AlexaCore.Testing
                 Assert.That(text.Contains(valueToCheck), Is.True, $"Output text doesn't contain {value}. Output text is: {text}");
             }
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifyTextMatchesAnotherIntentResponse(string counterPartIntentName, Dictionary<string, Slot> counterPartIntentSlots = null)
@@ -147,7 +152,7 @@ namespace AlexaCore.Testing
 
             Assert.That(text, Is.EqualTo(counterPartText));
 
-            return this as T;
+            return Convert(this);
         }
 
         public string GetOutputSpeechValue()
@@ -173,7 +178,7 @@ namespace AlexaCore.Testing
 
             logger(SkillResponse.Response.OutputSpeech.ToString());
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifySessionApplicationParameters(string key, string value)
@@ -188,7 +193,7 @@ namespace AlexaCore.Testing
 
             Assert.That(matchingParameter.Value, Is.EqualTo(value), $"Key found in '{sessionKey}' ({key}) has value '{matchingParameter.Value}'. Expected: '{value}'");
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifySessionCommandQueue(string key)
@@ -201,7 +206,7 @@ namespace AlexaCore.Testing
 
             Assert.That(matchingParameter, Is.Not.Null, $"No key found in '{sessionKey}' with key '{key}'");
 
-            return this as T;
+            return Convert(this);
         }
 
         public T VerifySessionInputQueue(string value, string[] tags = null)
@@ -226,7 +231,7 @@ namespace AlexaCore.Testing
                 }
             }
 
-            return this as T;
+            return Convert(this);
         }
 
         protected List<TSessionParam> GetSessionParameter<TSessionParam>(string sessionKey)
