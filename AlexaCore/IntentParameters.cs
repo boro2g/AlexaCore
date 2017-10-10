@@ -6,13 +6,22 @@ namespace AlexaCore
 {
     public class IntentParameters
     {
-	    public PersistentQueue<InputItem> InputQueue;
+        private const string InputsQueueKey = "Inputs";
 
-	    public PersistentQueue<CommandDefinition> CommandQueue;
+        private const string CommandsQueueKey = "Commands";
 
-	    public PersistentQueue<ApplicationParameter> ApplicationParameters;
+        private const string ParametersQueueKey = "Parameters";
 
-	    public ILambdaLogger Logger { get; }
+        public PersistentQueue<InputItem> InputQueue => GetParameter<PersistentQueue<InputItem>>(InputsQueueKey);
+
+        public PersistentQueue<CommandDefinition> CommandQueue => GetParameter<PersistentQueue<CommandDefinition>>(CommandsQueueKey);
+
+        public PersistentQueue<ApplicationParameter> ApplicationParameters =>
+            GetParameter<PersistentQueue<ApplicationParameter>>(ParametersQueueKey);
+
+        protected readonly Dictionary<string, object> ParameterQueues;
+
+        public ILambdaLogger Logger { get; }
 
 	    public string UserAccessToken => InputSession?.User?.AccessToken;
 
@@ -31,21 +40,37 @@ namespace AlexaCore
 			    InputSession.Attributes = new Dictionary<string, object>();
 		    }
 
-		    InputQueue = new PersistentQueue<InputItem>(logger, InputSession, "Inputs");
+	        ParameterQueues = new Dictionary<string, object>
+	        {
+	            {InputsQueueKey, new PersistentQueue<InputItem>(logger, InputSession, InputsQueueKey)},
+	            {CommandsQueueKey, new PersistentQueue<CommandDefinition>(logger, InputSession, CommandsQueueKey)},
+	            {ParametersQueueKey, new PersistentQueue<ApplicationParameter>(logger, InputSession, ParametersQueueKey)}
+	        };
 
-		    CommandQueue = new PersistentQueue<CommandDefinition>(logger, InputSession, "Commands");
-
-			ApplicationParameters = new PersistentQueue<ApplicationParameter>(logger, InputSession, "Parameters");
-
+	        AddParameters(logger, InputSession);
+            
 		    if (inputSession.New)
 		    {
-			    InputQueue.Reset();
-			    CommandQueue.Reset();
-				ApplicationParameters.Reset();
+		        foreach (var key in ParameterQueues.Keys)
+		        {
+		            var resettableQueue = ParameterQueues[key] as IResettable;
+
+		            resettableQueue?.Reset();
+		        }
 		    }
 	    }
 
-	    public Dictionary<string, object> SessionAttributes()
+        protected virtual void AddParameters(ILambdaLogger logger, Session inputSession)
+        {
+            
+        }
+
+        public T GetParameter<T>(string key) where T : class
+        {
+            return ParameterQueues[key] as T;
+        }
+
+        public Dictionary<string, object> SessionAttributes()
 	    {
 		    return InputSession.Attributes;
 	    }

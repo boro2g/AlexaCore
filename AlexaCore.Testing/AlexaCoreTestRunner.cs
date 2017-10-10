@@ -249,5 +249,12 @@ namespace AlexaCore.Testing
 
             return AlexaContext.Container.Resolve<TType>(key);
         }
+
+        public IntentParameters Parameters()
+        {
+            ValidateHasRun();
+
+            return AlexaContext.Parameters;
+        }
     }
 }

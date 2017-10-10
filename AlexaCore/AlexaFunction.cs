@@ -23,30 +23,50 @@ namespace AlexaCore
 
         private AlexaContext AlexaContext { get; set; }
 
+        protected virtual bool EnableOperationTimerLogging => true;
+
 		public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
 		{
-			_intentFactory = IntentFactory();
+		    IntentParameters parameters;
 
-		    context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
+            using (new OperationTimer(context.Logger.LogLine, "Init", EnableOperationTimerLogging))
+		    {
+		        _intentFactory = IntentFactory();
 
-            var parameters = new IntentParameters(context.Logger, input.Session);
+		        context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
 
-		    AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
+		        parameters = BuildParameters(context.Logger, input.Session);
 
-			FunctionInit(AlexaContext, parameters);
+		        AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
 
-			var innerResponse = Run(input, parameters);
+		        FunctionInit(AlexaContext, parameters);
+		    }
 
-			innerResponse.SessionAttributes = parameters.SessionAttributes();
+		    SkillResponse innerResponse;
 
-			parameters.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
+		    using (new OperationTimer(context.Logger.LogLine, "Run function", EnableOperationTimerLogging))
+		    {
+		        innerResponse = Run(input, parameters);
 
-			FunctionComplete(innerResponse);
+		        innerResponse.SessionAttributes = parameters.SessionAttributes();
 
-			return innerResponse;
+		        parameters.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
+		    }
+
+		    using (new OperationTimer(context.Logger.LogLine, "Function complete", EnableOperationTimerLogging))
+		    {
+		        FunctionComplete(innerResponse);
+		    }
+
+		    return innerResponse;
 		}
 
-		protected virtual void FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+        protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session)
+        {
+            return new IntentParameters(logger, session);
+        }
+
+        protected virtual void FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
 		{
 		}
 

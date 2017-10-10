@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AlexaCore
 {
-    public class PersistentQueue<T>
+    public class PersistentQueue<T> : IResettable
     {
 	    private readonly ILambdaLogger _logger;
 
