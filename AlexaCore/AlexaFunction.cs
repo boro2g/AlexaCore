@@ -39,7 +39,12 @@ namespace AlexaCore
 
 		        AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
 
-		        FunctionInit(AlexaContext, parameters);
+		        var initResponse = FunctionInit(AlexaContext, parameters);
+
+		        if (initResponse != null)
+		        {
+		            return initResponse;
+		        }
 		    }
 
 		    SkillResponse innerResponse;
@@ -65,10 +70,11 @@ namespace AlexaCore
         {
             return new IntentParameters(logger, session);
         }
-
-        protected virtual void FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
-		{
-		}
+       
+        protected virtual SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+        {
+            return null;
+        }
 
 		protected virtual void FunctionComplete(SkillResponse innerResponse)
 		{
