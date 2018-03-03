@@ -16,7 +16,6 @@ namespace AlexaCore.Intents
 
 	    public virtual string IntentName => GetType().Name;
 
-
 	    protected AlexaIntent(IntentParameters parameters)
 		{
 			Parameters = parameters;
@@ -39,12 +38,12 @@ namespace AlexaCore.Intents
 			return GetResponseInternal(slots);
 		}
 
-	    protected virtual SkillResponse Tell(string message)
+	    public virtual SkillResponse Tell(string message)
 	    {
 	        return BuildResponse(new PlainTextOutputSpeech {Text = message});
 	    }
 
-		protected virtual SkillResponse BuildResponse(IOutputSpeech outputSpeech)
+	    public virtual SkillResponse BuildResponse(IOutputSpeech outputSpeech)
 		{
 			return ResponseBuilder.Tell(outputSpeech);
 		}
