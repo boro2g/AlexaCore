@@ -243,6 +243,13 @@ namespace AlexaCore.Testing
             return parameters;
         }
 
+        public TType Resolve<TType>()
+        {
+            ValidateHasRun();
+
+            return AlexaContext.Container.Resolve<TType>();
+        }
+
         public TType Resolve<TType>(string key)
         {
             ValidateHasRun();

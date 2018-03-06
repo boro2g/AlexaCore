@@ -16,6 +16,10 @@ namespace AlexaCore.Tests.Function
         {
             AlexaContext.Container.RegisterType("globalItem", () => new TestDataStore("Function"));
 
+            AlexaContext.Container.RegisterType(() => new TestDependency("concrete"));
+
+            AlexaContext.Container.RegisterType<ITestDependency>(() => new TestDependency("interface"));
+
             return null;
         }
 

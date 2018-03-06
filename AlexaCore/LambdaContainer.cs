@@ -26,6 +26,13 @@ namespace AlexaCore
             return Container.Keys;
         }
 
+        public void RegisterType<T>(Func<T> valueActivator, bool lockValue = false)
+        {
+            string key = BuildKey<T>();
+
+            RegisterType(key, valueActivator, lockValue);
+        }
+
         public void RegisterType<T>(string key, Func<T> valueActivator, bool lockValue = false)
         {
             EnsureContainer();
@@ -57,6 +64,11 @@ namespace AlexaCore
             }
         }
 
+        public T Resolve<T>()
+        {
+            return Resolve<T>(BuildKey<T>());
+        }
+
         public T Resolve<T>(string key)
         {
             EnsureContainer();
@@ -67,6 +79,11 @@ namespace AlexaCore
             }
 
             return (T)Container[key].Value;
+        }
+
+        private string BuildKey<T>()
+        {
+            return $"_byType_{typeof(T).FullName}";
         }
 
         private void EnsureContainer()
