@@ -6,10 +6,6 @@ namespace AlexaCore.Intents
 {
     public abstract class IntentWithResponse : AlexaIntent
     {
-	    protected IntentWithResponse(IntentParameters parameters) : base(parameters)
-	    {
-	    }
-
 	    public abstract IEnumerable<PossibleResponse> PossibleResponses();
 
 	    public string PossibleResponsesAsText()

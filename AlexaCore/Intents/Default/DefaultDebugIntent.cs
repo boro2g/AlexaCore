@@ -9,10 +9,6 @@ namespace AlexaCore.Intents.Default
 {
     class DefaultDebugIntent : AlexaIntent
     {
-        public DefaultDebugIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         public override string IntentName => AlexaContext.IntentNames.DefaultDebugIntent;
 
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)

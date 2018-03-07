@@ -92,7 +92,7 @@ namespace AlexaCore
 
 		    if (input.GetRequestType() == typeof(LaunchRequest))
 		    {
-			    intentToRun = AlexaContext.IntentFactory.LaunchIntent(parameters);
+			    intentToRun = AlexaContext.IntentFactory.LaunchIntent();
 
 			    slots = new Dictionary<string, Slot>();
 		    }
@@ -112,7 +112,7 @@ namespace AlexaCore
 			    }
 			    else
 			    {
-				    intentToRun = _intentFactory.HelpIntent(parameters);
+				    intentToRun = _intentFactory.HelpIntent();
 			    }
 		    }
 

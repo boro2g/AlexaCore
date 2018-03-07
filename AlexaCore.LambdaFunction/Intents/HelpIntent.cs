@@ -7,10 +7,6 @@ namespace AlexaCore.LambdaFunction.Intents
 {
     class HelpIntent : AlexaHelpIntent
     {
-        public HelpIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return Tell("Help");

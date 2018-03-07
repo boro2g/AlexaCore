@@ -10,7 +10,7 @@ namespace AlexaCore.Tests
         public void WhenTestRunnerIsCast_ImplementationSpecificMethodsAreAvailable()
         {
             var testRunner = new TestFunctionTestRunner()
-                .RunInitialFunction("DebugIntent")
+                .RunInitialFunction("DefaultDebugIntent")
                 .DoSomethingSpecificToThisImplementation();
 
             Assert.That(testRunner.GetType(), Is.EqualTo(typeof(TestFunctionTestRunner)));

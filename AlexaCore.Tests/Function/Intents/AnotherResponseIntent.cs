@@ -6,12 +6,8 @@ using AlexaCore.Intents;
 
 namespace AlexaCore.Tests.Function.Intents
 {
-    class AnotherResponseIntent : IntentAsResponse
+    public class AnotherResponseIntent : IntentAsResponse
     {
-        public AnotherResponseIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return FindPreviousQuestionResponse(slots);

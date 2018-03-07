@@ -28,18 +28,23 @@ namespace AlexaCore.Intents
 
 			    if (!dictionary.ContainsKey(AlexaContext.IntentNames.CancelIntent))
 			    {
-				    dictionary[AlexaContext.IntentNames.CancelIntent] = CancelIntent(intentParameters);
+				    dictionary[AlexaContext.IntentNames.CancelIntent] = CancelIntent();
 			    }
 
 			    if (!dictionary.ContainsKey(AlexaContext.IntentNames.StopIntent))
 			    {
-				    dictionary[AlexaContext.IntentNames.StopIntent] = StopIntent(intentParameters);
+				    dictionary[AlexaContext.IntentNames.StopIntent] = StopIntent();
 			    }
 
 		        if (IncludeDefaultDebugIntent() && !dictionary.ContainsKey(AlexaContext.IntentNames.DefaultDebugIntent))
 		        {
-		            dictionary[AlexaContext.IntentNames.DefaultDebugIntent] = DefaultDebugIntent(intentParameters);
+		            dictionary[AlexaContext.IntentNames.DefaultDebugIntent] = DefaultDebugIntent();
                 }
+
+			    foreach (var key in dictionary.Keys)
+			    {
+				    dictionary[key].SetParameters(intentParameters);
+			    }
 
 				_intents = dictionary;
 		    }
@@ -49,9 +54,9 @@ namespace AlexaCore.Intents
 
 	    protected abstract List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters);
 
-	    public abstract AlexaIntent LaunchIntent(IntentParameters intentParameters);
+	    public abstract AlexaIntent LaunchIntent();
 
-        public abstract AlexaHelpIntent HelpIntent(IntentParameters intentParameters);
+        public abstract AlexaHelpIntent HelpIntent();
 
         public AlexaIntent GetIntent(string intentName)
 	    {
@@ -73,19 +78,19 @@ namespace AlexaCore.Intents
 		    return _intents?.Keys.Select(a => a) ?? new string[0];
 	    }
 
-	    protected virtual AlexaIntent CancelIntent(IntentParameters intentParameters)
+	    protected virtual AlexaIntent CancelIntent()
 	    {
-		    return new DefaultCancelIntent(intentParameters);
+		    return new DefaultCancelIntent();
 	    }
 
-	    protected virtual AlexaIntent StopIntent(IntentParameters intentParameters)
+	    protected virtual AlexaIntent StopIntent()
 	    {
-		    return new DefaultStopIntent(intentParameters);
+		    return new DefaultStopIntent();
 	    }
 
-        protected virtual AlexaIntent DefaultDebugIntent(IntentParameters intentParameters)
+        protected virtual AlexaIntent DefaultDebugIntent()
         {
-            return new DefaultDebugIntent(intentParameters);
+            return new DefaultDebugIntent();
         }
     }
 }

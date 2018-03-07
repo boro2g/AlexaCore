@@ -9,11 +9,7 @@ namespace AlexaCore.Tests.Function.Intents
     class QuestionNeedingResponseIntent : IntentWithResponse
     {
         protected override IEnumerable<string> RequiredSlots => new[] { "TestSlot" };
-
-        public QuestionNeedingResponseIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
+		
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             var slotValue = slots[RequiredSlots.ElementAt(0)].Value;

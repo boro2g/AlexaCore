@@ -17,7 +17,7 @@ namespace AlexaCore.Intents
 			    var intentBases = assembly.DefinedTypes
 					.Where(type => typeof(AlexaIntent).GetTypeInfo().IsAssignableFrom(type.AsType()) && !type.IsAbstract);
 
-			    intents.AddRange(intentBases.Select(intent => Activator.CreateInstance(intent.UnderlyingSystemType, intentParameters) as AlexaIntent));
+			    intents.AddRange(intentBases.Select(intent => Activator.CreateInstance(intent.UnderlyingSystemType) as AlexaIntent));
 		    }
 
 		    if (exclusionFilter != null)

@@ -6,11 +6,6 @@ namespace AlexaCore.Intents.Default
 {
     public class DefaultCancelIntent : AlexaIntent
 	{
-		public DefaultCancelIntent(IntentParameters intentParameters) : base(intentParameters)
-		{
-
-		}
-
 		public override string IntentName => AlexaContext.IntentNames.HelpIntent;
 
 		public override bool ShouldEndSession => true;

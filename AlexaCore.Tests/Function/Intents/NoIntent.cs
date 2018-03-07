@@ -8,10 +8,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class NoIntent : IntentAsResponse
     {
-        public NoIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return FindPreviousQuestionResponse(slots);

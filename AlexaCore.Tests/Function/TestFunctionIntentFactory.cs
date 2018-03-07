@@ -18,14 +18,14 @@ namespace AlexaCore.Tests.Function
                 intentParameters).ToList();
         }
 
-        public override AlexaIntent LaunchIntent(IntentParameters intentParameters)
+        public override AlexaIntent LaunchIntent()
         {
-            return new LaunchIntent(intentParameters);
+            return new LaunchIntent();
         }
 
-        public override AlexaHelpIntent HelpIntent(IntentParameters intentParameters)
+        public override AlexaHelpIntent HelpIntent()
         {
-            return new HelpIntent(intentParameters);
+            return new HelpIntent();
         }
 
         public override bool IncludeDefaultDebugIntent()

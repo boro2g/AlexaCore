@@ -7,10 +7,6 @@ namespace AlexaCore.LambdaFunction.Intents
 {
     class LaunchIntent : AlexaIntent
     {
-        public LaunchIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return Tell("Launch");

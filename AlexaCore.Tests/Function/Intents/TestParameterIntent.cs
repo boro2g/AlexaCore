@@ -7,10 +7,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class TestParameterIntent : AlexaIntent
     {
-        public TestParameterIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             if (Parameters is TestIntentParameters testIntentParameters)
