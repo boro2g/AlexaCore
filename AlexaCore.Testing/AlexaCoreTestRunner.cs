@@ -246,14 +246,14 @@ namespace AlexaCore.Testing
         {
             ValidateHasRun();
 
-            return AlexaContext.DiContainer.Resolve<TType>();
+            return AlexaContext.Container.Resolve<TType>();
         }
 
         public TType Resolve<TType>(string key)
         {
             ValidateHasRun();
 
-            return AlexaContext.DiContainer.ResolveNamed<TType>(key);
+            return AlexaContext.Container.ResolveNamed<TType>(key);
         }
 
         public IntentParameters Parameters()

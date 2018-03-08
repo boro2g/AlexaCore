@@ -11,7 +11,7 @@ namespace AlexaCore
         
         public static IntentNames IntentNames { get; private set; }
         
-        public static IContainer DiContainer { get; private set; }
+        public static IContainer Container { get; private set; }
 
         public AlexaContext(IntentFactory intentFactory, IntentNames intentNames, IntentParameters parameters,
             IContainer container)
@@ -20,7 +20,7 @@ namespace AlexaCore
 
 		    Parameters = parameters;
 
-            DiContainer = container;
+            Container = container;
 
             IntentNames = intentNames ?? new IntentNames();
         }
