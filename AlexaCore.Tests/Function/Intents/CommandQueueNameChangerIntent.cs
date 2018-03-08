@@ -7,10 +7,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class CommandQueueNameChangerIntent : AlexaIntent
     {
-        public CommandQueueNameChangerIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return Tell("Name changed");

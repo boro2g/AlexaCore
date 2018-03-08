@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,20 +9,19 @@ namespace AlexaCore.LambdaFunction
 {
     public class ExampleIntentFactory : IntentFactory
     {
-        protected override List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters)
+        protected override List<Type> ApplicationIntentTypes()
         {
-            return IntentFinder.FindIntents(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly },
-                intentParameters).ToList();
+            return IntentFinder.FindIntentTypes(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly }).ToList();
         }
 
-        public override AlexaIntent LaunchIntent(IntentParameters intentParameters)
+        public override Type LaunchIntentType()
         {
-            return new LaunchIntent(intentParameters);
+            return typeof(LaunchIntent);
         }
 
-        public override AlexaHelpIntent HelpIntent(IntentParameters intentParameters)
+        public override Type HelpIntentType()
         {
-            return new HelpIntent(intentParameters);
+            return typeof(HelpIntent);
         }
     }
 }

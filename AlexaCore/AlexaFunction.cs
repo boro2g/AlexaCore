@@ -1,133 +1,111 @@
-﻿using System;
-using System.Collections.Generic;
-using Alexa.NET;
-using Alexa.NET.Request;
-using Alexa.NET.Request.Type;
+﻿using Alexa.NET.Request;
 using Alexa.NET.Response;
 using AlexaCore.Intents;
 using Amazon.Lambda.Core;
+using Autofac;
 using Newtonsoft.Json;
 
 namespace AlexaCore
 {
     public abstract class AlexaFunction
     {
-	    private IntentFactory _intentFactory;
-	   
-	    protected abstract IntentFactory IntentFactory();
+        private IntentFactory _intentFactory;
 
-	    protected virtual IntentNames IntentNames()
-	    {
-		    return null;
-		}
+        private IContainer _container;
+
+        protected abstract IntentFactory IntentFactory();
+
+        protected virtual IntentNames IntentNames()
+        {
+            return null;
+        }
 
         private AlexaContext AlexaContext { get; set; }
 
         protected virtual bool EnableOperationTimerLogging => true;
 
-		public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
-		{
-		    IntentParameters parameters;
+        public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
+        {
+            IntentParameters parameters;
 
             using (new OperationTimer(context.Logger.LogLine, "Init", EnableOperationTimerLogging))
-		    {
-		        _intentFactory = IntentFactory();
+            {
+                parameters = SetupFunction(input, context);
 
-		        context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
+                context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
 
-		        parameters = BuildParameters(context.Logger, input.Session);
+                var initResponse = FunctionInit(AlexaContext, parameters);
 
-		        AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
+                if (initResponse != null)
+                {
+                    return initResponse;
+                }
+            }
 
-		        var initResponse = FunctionInit(AlexaContext, parameters);
+            SkillResponse innerResponse;
 
-		        if (initResponse != null)
-		        {
-		            return initResponse;
-		        }
-		    }
+            using (new OperationTimer(context.Logger.LogLine, "Run function", EnableOperationTimerLogging))
+            {
+                innerResponse = new AlexaFunctionRunner(_intentFactory, NoIntentMatchedText).Run(input, parameters);
 
-		    SkillResponse innerResponse;
+                innerResponse.SessionAttributes = parameters.SessionAttributes();
 
-		    using (new OperationTimer(context.Logger.LogLine, "Run function", EnableOperationTimerLogging))
-		    {
-		        innerResponse = Run(input, parameters);
+                context.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
+            }
 
-		        innerResponse.SessionAttributes = parameters.SessionAttributes();
+            using (new OperationTimer(context.Logger.LogLine, "Function complete", EnableOperationTimerLogging))
+            {
+                FunctionComplete(innerResponse);
+            }
 
-		        parameters.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
-		    }
+            return innerResponse;
+        }
 
-		    using (new OperationTimer(context.Logger.LogLine, "Function complete", EnableOperationTimerLogging))
-		    {
-		        FunctionComplete(innerResponse);
-		    }
+        private IntentParameters SetupFunction(SkillRequest input, ILambdaContext context)
+        {
+            _intentFactory = IntentFactory();
 
-		    return innerResponse;
-		}
+            var parameters = BuildParameters(context.Logger, input.Session);
+
+            _container = BuildContainer(_intentFactory, parameters);
+
+            AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters, _container);
+
+            _intentFactory.BuildIntents(parameters, _container);
+
+            return parameters;
+        }
+
+        private IContainer BuildContainer(IntentFactory intentFactory, IntentParameters parameters)
+        {
+            var builder = new ContainerBuilder();
+
+            intentFactory.RegisterIntents(builder);
+
+            RegisterDependencies(builder, parameters);
+
+            return builder.Build();
+        }
+
+        protected virtual void RegisterDependencies(ContainerBuilder builder, IntentParameters parameters)
+        {
+
+        }
 
         protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session)
         {
             return new IntentParameters(logger, session);
         }
-       
+
         protected virtual SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
         {
             return null;
         }
 
-		protected virtual void FunctionComplete(SkillResponse innerResponse)
-		{
-		}
+        protected virtual void FunctionComplete(SkillResponse innerResponse)
+        {
+        }
 
-		public virtual string NoIntentMatchedText => "No intent matched - intent was {0}";
-
-	    private SkillResponse Run(SkillRequest input, IntentParameters parameters)
-	    {
-		    AlexaIntent intentToRun = null;
-
-		    Dictionary<string, Slot> slots = null;
-
-		    string intentName = "";
-
-		    if (input.GetRequestType() == typeof(LaunchRequest))
-		    {
-			    intentToRun = AlexaContext.IntentFactory.LaunchIntent(parameters);
-
-			    slots = new Dictionary<string, Slot>();
-		    }
-		    else if (input.GetRequestType() == typeof(IntentRequest))
-		    {
-			    var intentRequest = (IntentRequest)input.Request;
-
-			    var intents = AlexaContext.IntentFactory.Intents(parameters);
-
-			    slots = intentRequest.Intent.Slots;
-
-			    intentName = intentRequest.Intent.Name;
-
-				if (intents.ContainsKey(intentRequest.Intent.Name))
-			    {
-				    intentToRun = intents[intentRequest.Intent.Name];
-			    }
-			    else
-			    {
-				    intentToRun = _intentFactory.HelpIntent(parameters);
-			    }
-		    }
-
-		    if (intentToRun == null)
-		    {
-			    return ResponseBuilder.Tell(new PlainTextOutputSpeech { Text = String.Format(NoIntentMatchedText, intentName) });
-		    }
-
-		    var skillResponse = intentToRun.GetResponse(slots);
-
-		    skillResponse.Response.ShouldEndSession = intentToRun.ShouldEndSession;
-
-		    parameters.CommandQueue.Enqueue(intentToRun.CommandDefinition());
-
-		    return skillResponse;
-	    }
-	}
+        public virtual string NoIntentMatchedText => "No intent matched - intent was {0}";
+    }
 }

@@ -2,6 +2,7 @@
 using Alexa.NET.Response;
 using AlexaCore.Intents;
 using Amazon.Lambda.Core;
+using Autofac;
 
 namespace AlexaCore.Tests.Function
 {
@@ -14,13 +15,16 @@ namespace AlexaCore.Tests.Function
 
         protected override SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
         {
-            AlexaContext.Container.RegisterType("globalItem", () => new TestDataStore("Function"));
-
-            AlexaContext.Container.RegisterType(() => new TestDependency("concrete"));
-
-            AlexaContext.Container.RegisterType<ITestDependency>(() => new TestDependency("interface"));
-
             return null;
+        }
+
+        protected override void RegisterDependencies(ContainerBuilder builder, IntentParameters parameters)
+        {
+            builder.Register(a => new TestDependency("interface")).As<ITestDependency>();
+
+            builder.Register(a => new TestDependency("concrete"));
+
+            builder.Register(a => new TestDataStore("Function")).Named<ITestDataStore>("globalItem");
         }
 
         protected override IntentParameters BuildParameters(ILambdaLogger logger, Session session)

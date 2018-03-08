@@ -5,6 +5,7 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
 using Amazon.Lambda.TestUtilities;
+using Autofac;
 using NUnit.Framework;
 
 namespace AlexaCore.Testing
@@ -13,7 +14,7 @@ namespace AlexaCore.Testing
     {
         private bool _hasRun;
 
-        private readonly AlexaFunction _function;
+        private AlexaFunction _function;
 
         public SkillResponse SkillResponse { get; private set; }
 
@@ -38,8 +39,10 @@ namespace AlexaCore.Testing
 
         public abstract AlexaFunction BuildFunction();
         
-        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null) 
+        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null, Request request = null) 
         {
+            _function = BuildFunction();
+
             var lambdaContext = new TestLambdaContext
             {
                 Logger = new TestLambdaLogger(),
@@ -50,16 +53,17 @@ namespace AlexaCore.Testing
                 slots = new Dictionary<string, Slot>();
             }
 
-            AlexaContext.Container.Reset();
-
-            RegisterTypes();
-
+            if (request == null)
+            {
+                request = new IntentRequest {Intent = new Intent {Name = intentName, Slots = slots}};
+            }
+            
             var response =
                 _function.FunctionHandler(
                     new SkillRequest
                     {
                         Session = session ?? new Session { New = true, SessionId = newSessionId },
-                        Request = new IntentRequest { Intent = new Intent { Name = intentName, Slots = slots} },
+                        Request = request,
                         Context = context
                     }, lambdaContext);
 
@@ -70,14 +74,14 @@ namespace AlexaCore.Testing
             return Convert(this);
         }
 
+        public virtual void UpdateFunction(AlexaFunction function)
+        {
+            _function = function;
+        }
+
         public virtual T Convert(AlexaCoreTestRunner<T> alexaCoreTestRunner)
         {
             return alexaCoreTestRunner as T;
-        }
-
-        protected virtual void RegisterTypes()
-        {
-
         }
         
         public T RunAgain(string intentName, Dictionary<string, Slot> slots = null)
@@ -254,7 +258,7 @@ namespace AlexaCore.Testing
         {
             ValidateHasRun();
 
-            return AlexaContext.Container.Resolve<TType>(key);
+            return AlexaContext.Container.ResolveNamed<TType>(key);
         }
 
         public IntentParameters Parameters()

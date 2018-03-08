@@ -43,20 +43,26 @@ class DemoIntent : AlexaIntent
 ```csharp
 class TestFunctionIntentFactory : IntentFactory
 {
-    protected override List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters)
-    {
-        //either register explicitly 
-        //return new List<AlexaIntent> {new HelpIntent(intentParameters), new LaunchIntent(intentParameters)};
+	protected override List<Type> ApplicationIntentTypes()
+        {
+	    //either manully return the types or find them with reflection
+            return IntentFinder.FindIntentTypes(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly }).ToList();
+        }
 
-        //or use reflection to find all your intents based of a set of source assemblies
-        return IntentFinder.FindIntents(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly },
-            intentParameters).ToList();
-    }
+        public override Type LaunchIntentType()
+        {
+            return typeof(LaunchIntent);
+        }
 
-    public override AlexaIntent LaunchIntent(IntentParameters intentParameters)
-    {
-        return new LaunchIntent(intentParameters);
-    }
+        public override Type HelpIntentType()
+        {
+            return typeof(HelpIntent);
+        }
+
+        public override bool IncludeDefaultDebugIntent()
+        {
+            return true;
+        }
 }
 ```
 
@@ -101,22 +107,10 @@ To replace with your own you simply need to create Intents that are configured w
 # Extensions:
 Some IEnumerable extensions are available to: `PickRandom`, `Shuffle` and `JoinStringList`. The latter is useful for pretty printing lists of strings. The output for an array `new[] { "1","2","3" }` will be: `"1, 2 and 3"`
 
-# Global properties ala an IOC Container:
-You can register global properties much like you would with an IOC container. In your implementation of **AlexaFunction** you can setup any registrations:
-```csharp
-protected override SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
-{
-    AlexaContext.Container.RegisterType("key", () => new GlobalTypeOrDataStore(new AmazonDynamoDBClient()));
-    
-    //If you return a SkillResponse here every intent will be skipped and this response gets returned everytime. 
-    //Useful if you need to ensure something is initialized before every function.
-    return null;
-}
-```
-Which can then be resolved anywhere else in your code via:
-```csharp
-_dataStore = AlexaContext.Container.Resolve<IDataStore>("key");
-```
+# Intent IOC Container:
+The latest release brings in the ability to inject dependencies into any intent. See the `ConstructorInjectionIntent` as an example.
+
+If you need to inject specific dependencies for testing see `TestFunctionTestRunner` for examples of how to select a mock implementation of a function.
 
 # Unit Testing your function:
 The `AlexaCore.Testing` project contains a wrapper to assist fluently testing your function. You need to implement `AlexaCoreTestRunner` - see `TestFunctionTestRunner` as an example.

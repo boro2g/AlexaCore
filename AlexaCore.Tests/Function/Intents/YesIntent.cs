@@ -7,10 +7,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class YesIntent : IntentAsResponse
     {
-        public YesIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return FindPreviousQuestionResponse(slots);

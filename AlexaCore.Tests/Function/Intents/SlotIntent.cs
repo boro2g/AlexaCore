@@ -8,10 +8,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class SlotIntent : AlexaIntent
     {
-        public SlotIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return Tell($"Slot value: {slots[RequiredSlots.ElementAt(0)].Value}");
