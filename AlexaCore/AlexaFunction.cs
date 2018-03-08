@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Alexa.NET;
-using Alexa.NET.Request;
-using Alexa.NET.Request.Type;
+﻿using Alexa.NET.Request;
 using Alexa.NET.Response;
 using AlexaCore.Intents;
 using Amazon.Lambda.Core;
@@ -34,17 +30,9 @@ namespace AlexaCore
 
             using (new OperationTimer(context.Logger.LogLine, "Init", EnableOperationTimerLogging))
 		    {
-		        _intentFactory = IntentFactory();
+		        parameters = SetupFunction(input, context);
 
-		        _container = BuildContainer(_intentFactory);
-
-		        parameters = BuildParameters(context.Logger, input.Session);
-
-		        AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
-
-                _intentFactory.BuildIntents(parameters, _container);
-
-                context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
+		        context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
 
 		        var initResponse = FunctionInit(AlexaContext, parameters);
 
@@ -58,7 +46,7 @@ namespace AlexaCore
 
 		    using (new OperationTimer(context.Logger.LogLine, "Run function", EnableOperationTimerLogging))
 		    {
-		        innerResponse = Run(input, parameters);
+		        innerResponse = new AlexaFunctionRunner(_intentFactory, NoIntentMatchedText).Run(input, parameters);
 
 		        innerResponse.SessionAttributes = parameters.SessionAttributes();
 
@@ -72,6 +60,21 @@ namespace AlexaCore
 
 		    return innerResponse;
 		}
+
+        private IntentParameters SetupFunction(SkillRequest input, ILambdaContext context)
+        {
+            _intentFactory = IntentFactory();
+
+            _container = BuildContainer(_intentFactory);
+
+            var parameters = BuildParameters(context.Logger, input.Session);
+
+            AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
+
+            _intentFactory.BuildIntents(parameters, _container);
+
+            return parameters;
+        }
 
         private IContainer BuildContainer(IntentFactory intentFactory)
         {
@@ -104,53 +107,5 @@ namespace AlexaCore
 		}
 
 		public virtual string NoIntentMatchedText => "No intent matched - intent was {0}";
-
-	    private SkillResponse Run(SkillRequest input, IntentParameters parameters)
-	    {
-		    AlexaIntent intentToRun = null;
-
-		    Dictionary<string, Slot> slots = null;
-
-		    string intentName = "";
-
-		    if (input.GetRequestType() == typeof(LaunchRequest))
-		    {
-			    intentToRun = AlexaContext.IntentFactory.LaunchIntent();
-
-			    slots = new Dictionary<string, Slot>();
-		    }
-		    else if (input.GetRequestType() == typeof(IntentRequest))
-		    {
-			    var intentRequest = (IntentRequest)input.Request;
-
-			    var intents = AlexaContext.IntentFactory.Intents();
-
-			    slots = intentRequest.Intent.Slots;
-
-			    intentName = intentRequest.Intent.Name;
-
-				if (intents.ContainsKey(intentRequest.Intent.Name))
-			    {
-				    intentToRun = intents[intentRequest.Intent.Name];
-			    }
-			    else
-			    {
-				    intentToRun = _intentFactory.HelpIntent();
-			    }
-		    }
-
-		    if (intentToRun == null)
-		    {
-			    return ResponseBuilder.Tell(new PlainTextOutputSpeech { Text = String.Format(NoIntentMatchedText, intentName) });
-		    }
-
-		    var skillResponse = intentToRun.GetResponse(slots);
-
-		    skillResponse.Response.ShouldEndSession = intentToRun.ShouldEndSession;
-
-		    parameters.CommandQueue.Enqueue(intentToRun.CommandDefinition());
-
-		    return skillResponse;
-	    }
 	}
 }
