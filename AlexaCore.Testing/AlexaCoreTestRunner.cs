@@ -34,7 +34,7 @@ namespace AlexaCore.Testing
 
             _hasRun = false;
 
-            //_function = BuildFunction();
+            _function = BuildFunction();
         }
 
         public abstract AlexaFunction BuildFunction();
