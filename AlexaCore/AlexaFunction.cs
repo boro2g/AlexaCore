@@ -9,57 +9,57 @@ namespace AlexaCore
 {
     public abstract class AlexaFunction
     {
-	    private IntentFactory _intentFactory;
+        private IntentFactory _intentFactory;
 
         private IContainer _container;
-	   
-	    protected abstract IntentFactory IntentFactory();
 
-	    protected virtual IntentNames IntentNames()
-	    {
-		    return null;
-		}
+        protected abstract IntentFactory IntentFactory();
+
+        protected virtual IntentNames IntentNames()
+        {
+            return null;
+        }
 
         private AlexaContext AlexaContext { get; set; }
 
         protected virtual bool EnableOperationTimerLogging => true;
 
         public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
-		{
+        {
             IntentParameters parameters;
 
             using (new OperationTimer(context.Logger.LogLine, "Init", EnableOperationTimerLogging))
-		    {
-		        parameters = SetupFunction(input, context);
+            {
+                parameters = SetupFunction(input, context);
 
-		        context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
+                context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
 
-		        var initResponse = FunctionInit(AlexaContext, parameters);
+                var initResponse = FunctionInit(AlexaContext, parameters);
 
-		        if (initResponse != null)
-		        {
-		            return initResponse;
-		        }
-		    }
+                if (initResponse != null)
+                {
+                    return initResponse;
+                }
+            }
 
-		    SkillResponse innerResponse;
+            SkillResponse innerResponse;
 
-		    using (new OperationTimer(context.Logger.LogLine, "Run function", EnableOperationTimerLogging))
-		    {
-		        innerResponse = new AlexaFunctionRunner(_intentFactory, NoIntentMatchedText).Run(input, parameters);
+            using (new OperationTimer(context.Logger.LogLine, "Run function", EnableOperationTimerLogging))
+            {
+                innerResponse = new AlexaFunctionRunner(_intentFactory, NoIntentMatchedText).Run(input, parameters);
 
-		        innerResponse.SessionAttributes = parameters.SessionAttributes();
+                innerResponse.SessionAttributes = parameters.SessionAttributes();
 
-		        context.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
-		    }
+                context.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
+            }
 
-		    using (new OperationTimer(context.Logger.LogLine, "Function complete", EnableOperationTimerLogging))
-		    {
-		        FunctionComplete(innerResponse);
-		    }
+            using (new OperationTimer(context.Logger.LogLine, "Function complete", EnableOperationTimerLogging))
+            {
+                FunctionComplete(innerResponse);
+            }
 
-		    return innerResponse;
-		}
+            return innerResponse;
+        }
 
         private IntentParameters SetupFunction(SkillRequest input, ILambdaContext context)
         {
@@ -89,23 +89,23 @@ namespace AlexaCore
 
         protected virtual void RegisterDependencies(ContainerBuilder builder, IntentParameters parameters)
         {
-            
+
         }
 
         protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session)
         {
             return new IntentParameters(logger, session);
         }
-       
+
         protected virtual SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
         {
             return null;
         }
 
-		protected virtual void FunctionComplete(SkillResponse innerResponse)
-		{
-		}
+        protected virtual void FunctionComplete(SkillResponse innerResponse)
+        {
+        }
 
-		public virtual string NoIntentMatchedText => "No intent matched - intent was {0}";
-	}
+        public virtual string NoIntentMatchedText => "No intent matched - intent was {0}";
+    }
 }

@@ -39,7 +39,7 @@ namespace AlexaCore.Testing
 
         public abstract AlexaFunction BuildFunction();
         
-        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null) 
+        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null, Request request = null) 
         {
             _function = BuildFunction();
 
@@ -52,13 +52,18 @@ namespace AlexaCore.Testing
             {
                 slots = new Dictionary<string, Slot>();
             }
+
+            if (request == null)
+            {
+                request = new IntentRequest {Intent = new Intent {Name = intentName, Slots = slots}};
+            }
             
             var response =
                 _function.FunctionHandler(
                     new SkillRequest
                     {
                         Session = session ?? new Session { New = true, SessionId = newSessionId },
-                        Request = new IntentRequest { Intent = new Intent { Name = intentName, Slots = slots } },
+                        Request = request,
                         Context = context
                     }, lambdaContext);
 

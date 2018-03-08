@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Alexa.NET;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
 using AlexaCore.Intents;
+[assembly: InternalsVisibleTo("AlexaCore.Tests")]
 
 namespace AlexaCore
 {
@@ -37,7 +39,7 @@ namespace AlexaCore
             {
                 var intentRequest = (IntentRequest)input.Request;
 
-                var intents = AlexaContext.IntentFactory.Intents();
+                var intents = _intentFactory.Intents();
 
                 slots = intentRequest.Intent.Slots;
 

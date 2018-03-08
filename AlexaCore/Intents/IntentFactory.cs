@@ -9,6 +9,8 @@ namespace AlexaCore.Intents
     public abstract class IntentFactory
     {
 	    private static Dictionary<string, AlexaIntent> _intents;
+        private AlexaHelpIntent _helpIntent;
+        private AlexaIntent _launchIntent;
 
         protected IntentFactory()
         {
@@ -62,13 +64,13 @@ namespace AlexaCore.Intents
                     dictionary[AlexaContext.IntentNames.DefaultDebugIntent] = container.Resolve<DefaultDebugIntent>();
                 }
 
-                var helpIntent = container.Resolve<AlexaHelpIntent>();
+                _helpIntent = container.Resolve<AlexaHelpIntent>();
 
-                dictionary[helpIntent.IntentName] = helpIntent;
+                dictionary[_helpIntent.IntentName] = _helpIntent;
 
-                var launchIntent = container.ResolveNamed<AlexaIntent>("LaunchIntent");
+                _launchIntent = container.ResolveNamed<AlexaIntent>("LaunchIntent");
 
-                dictionary[launchIntent.IntentName] = launchIntent;
+                dictionary[_launchIntent.IntentName] = _launchIntent;
 
                 foreach (var key in dictionary.Keys)
                 {
@@ -88,12 +90,12 @@ namespace AlexaCore.Intents
 
         public virtual AlexaIntent LaunchIntent()
         {
-            throw new NotImplementedException();
+            return _launchIntent;
         }
 
         public virtual AlexaHelpIntent HelpIntent()
         {
-            throw new NotImplementedException();
+            return _helpIntent;
         }
 
         public abstract Type LaunchIntentType();
