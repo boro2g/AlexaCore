@@ -43,9 +43,9 @@ class DemoIntent : AlexaIntent
 ```csharp
 class TestFunctionIntentFactory : IntentFactory
 {
-		protected override List<Type> ApplicationIntentTypes()
+	protected override List<Type> ApplicationIntentTypes()
         {
-			//either manully return the types or find them with reflection
+	    //either manully return the types or find them with reflection
             return IntentFinder.FindIntentTypes(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly }).ToList();
         }
 
