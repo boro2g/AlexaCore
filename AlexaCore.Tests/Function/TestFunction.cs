@@ -2,6 +2,7 @@
 using Alexa.NET.Response;
 using AlexaCore.Intents;
 using Amazon.Lambda.Core;
+using Autofac;
 
 namespace AlexaCore.Tests.Function
 {
@@ -21,6 +22,11 @@ namespace AlexaCore.Tests.Function
             AlexaContext.Container.RegisterType<ITestDependency>(() => new TestDependency("interface"));
 
             return null;
+        }
+
+        protected override void RegisterDependencies(ContainerBuilder builder)
+        {
+            builder.Register(a => new TestDependency("bob")).As<ITestDependency>();
         }
 
         protected override IntentParameters BuildParameters(ILambdaLogger logger, Session session)

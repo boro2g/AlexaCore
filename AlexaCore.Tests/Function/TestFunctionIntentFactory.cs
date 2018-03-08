@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AlexaCore.Intents;
@@ -8,24 +9,19 @@ namespace AlexaCore.Tests.Function
 {
     class TestFunctionIntentFactory : IntentFactory
     {
-        protected override List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters)
+        protected override List<Type> ApplicationIntentTypes()
         {
-            //either register explicitly 
-            //return new List<AlexaIntent> {new HelpIntent(intentParameters), new LaunchIntent(intentParameters)};
-
-            //or use reflection to find all your intents based of a set of source assemblies
-            return IntentFinder.FindIntents(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly },
-                intentParameters).ToList();
+            return IntentFinder.FindIntentTypes(new[] { typeof(LaunchIntent).GetTypeInfo().Assembly }).ToList();
         }
 
-        public override AlexaIntent LaunchIntent()
+        public override Type LaunchIntentType()
         {
-            return new LaunchIntent();
+            return typeof(LaunchIntent);
         }
 
-        public override AlexaHelpIntent HelpIntent()
+        public override Type HelpIntentType()
         {
-            return new HelpIntent();
+            return typeof(HelpIntent);
         }
 
         public override bool IncludeDefaultDebugIntent()

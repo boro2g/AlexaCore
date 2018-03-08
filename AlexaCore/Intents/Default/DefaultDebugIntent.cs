@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace AlexaCore.Intents.Default
 {
-    class DefaultDebugIntent : AlexaIntent
+    public class DefaultDebugIntent : AlexaIntent
     {
         public override string IntentName => AlexaContext.IntentNames.DefaultDebugIntent;
 

@@ -6,6 +6,7 @@ using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
 using AlexaCore.Intents;
 using Amazon.Lambda.Core;
+using Autofac;
 using Newtonsoft.Json;
 
 namespace AlexaCore
@@ -13,6 +14,8 @@ namespace AlexaCore
     public abstract class AlexaFunction
     {
 	    private IntentFactory _intentFactory;
+
+        private IContainer _container;
 	   
 	    protected abstract IntentFactory IntentFactory();
 
@@ -27,17 +30,21 @@ namespace AlexaCore
 
 		public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
 		{
-		    IntentParameters parameters;
+            IntentParameters parameters;
 
             using (new OperationTimer(context.Logger.LogLine, "Init", EnableOperationTimerLogging))
 		    {
 		        _intentFactory = IntentFactory();
 
-		        context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
+		        _container = BuildContainer(_intentFactory);
 
 		        parameters = BuildParameters(context.Logger, input.Session);
 
 		        AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
+
+                _intentFactory.BuildIntents(parameters, _container);
+
+                context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
 
 		        var initResponse = FunctionInit(AlexaContext, parameters);
 
@@ -65,6 +72,22 @@ namespace AlexaCore
 
 		    return innerResponse;
 		}
+
+        private IContainer BuildContainer(IntentFactory intentFactory)
+        {
+            var builder = new ContainerBuilder();
+
+            intentFactory.RegisterIntents(builder);
+
+            RegisterDependencies(builder);
+
+            return builder.Build();
+        }
+
+        protected virtual void RegisterDependencies(ContainerBuilder builder)
+        {
+            
+        }
 
         protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session)
         {
@@ -100,7 +123,7 @@ namespace AlexaCore
 		    {
 			    var intentRequest = (IntentRequest)input.Request;
 
-			    var intents = AlexaContext.IntentFactory.Intents(parameters);
+			    var intents = AlexaContext.IntentFactory.Intents();
 
 			    slots = intentRequest.Intent.Slots;
 

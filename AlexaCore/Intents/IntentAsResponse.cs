@@ -15,20 +15,20 @@ namespace AlexaCore.Intents
 
 			if (lastCommand != null && lastCommand.ExpectsResponse)
 			{
-			    if (AlexaContext.IntentFactory.Intents(Parameters)[lastCommand.IntentName] is IntentWithResponse intent)
-				{
-					Parameters.Logger.LogLine($"IntentAsResponse: {intent.IntentName}");
+                if (AlexaContext.IntentFactory.Intents()[lastCommand.IntentName] is IntentWithResponse intent)
+                {
+                    Parameters.Logger.LogLine($"IntentAsResponse: {intent.IntentName}");
 
-					var matchedResponse = intent.PossibleResponses().FirstOrDefault(a => a.IntentName == IntentName);
+                    var matchedResponse = intent.PossibleResponses().FirstOrDefault(a => a.IntentName == IntentName);
 
-					if (matchedResponse != null)
-					{
-						return matchedResponse.Action();
-					}
+                    if (matchedResponse != null)
+                    {
+                        return matchedResponse.Action();
+                    }
 
-					return Tell(intent.PossibleResponsesAsText());
-				}
-			}
+                    return Tell(intent.PossibleResponsesAsText());
+                }
+            }
 
 			return AlexaContext.IntentFactory.HelpIntent().GetResponse(slots);
 		}
