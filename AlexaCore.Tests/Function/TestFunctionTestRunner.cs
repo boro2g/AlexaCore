@@ -8,14 +8,14 @@ namespace AlexaCore.Tests.Function
 
         public override AlexaFunction BuildFunction()
         {
-            _performRegisterTypes = false;
-
-            return new TestFunction();
+            return SelectFunction(_performRegisterTypes);
         }
 
         public TestFunctionTestRunner PerformRegisterTypes(bool value)
         {
             _performRegisterTypes = value;
+
+            UpdateFunction(SelectFunction(_performRegisterTypes));
 
             return this;
         }
@@ -25,12 +25,9 @@ namespace AlexaCore.Tests.Function
             return this;
         }
 
-        protected override void RegisterTypes()
+        private AlexaFunction SelectFunction(bool selectMockFunction)
         {
-            if (_performRegisterTypes)
-            {
-                //AlexaContext.Container.RegisterType("globalItem", () => new TestDataStore("override"), true);
-            }
+            return selectMockFunction ? new MockTestFunction() : new TestFunction();
         }
     }
 }

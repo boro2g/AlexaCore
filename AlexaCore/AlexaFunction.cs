@@ -24,7 +24,7 @@ namespace AlexaCore
 
         protected virtual bool EnableOperationTimerLogging => true;
 
-		public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
+        public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
 		{
             IntentParameters parameters;
 
