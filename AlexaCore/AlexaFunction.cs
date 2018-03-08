@@ -65,29 +65,29 @@ namespace AlexaCore
         {
             _intentFactory = IntentFactory();
 
-            _container = BuildContainer(_intentFactory);
-
             var parameters = BuildParameters(context.Logger, input.Session);
 
-            AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters);
+            _container = BuildContainer(_intentFactory, parameters);
+
+            AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters, _container);
 
             _intentFactory.BuildIntents(parameters, _container);
 
             return parameters;
         }
 
-        private IContainer BuildContainer(IntentFactory intentFactory)
+        private IContainer BuildContainer(IntentFactory intentFactory, IntentParameters parameters)
         {
             var builder = new ContainerBuilder();
 
             intentFactory.RegisterIntents(builder);
 
-            RegisterDependencies(builder);
+            RegisterDependencies(builder, parameters);
 
             return builder.Build();
         }
 
-        protected virtual void RegisterDependencies(ContainerBuilder builder)
+        protected virtual void RegisterDependencies(ContainerBuilder builder, IntentParameters parameters)
         {
             
         }

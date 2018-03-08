@@ -17,7 +17,7 @@ namespace AlexaCore.Tests.Function
             return ResponseBuilder.Tell(new PlainTextOutputSpeech {Text = "InitOnly"});
         }
 
-        protected override void RegisterDependencies(ContainerBuilder builder)
+        protected override void RegisterDependencies(ContainerBuilder builder, IntentParameters parameters)
         {
             builder.Register(a => new TestDependency("init only")).As<ITestDependency>();
         }

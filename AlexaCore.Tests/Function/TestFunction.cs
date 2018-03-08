@@ -24,7 +24,7 @@ namespace AlexaCore.Tests.Function
             return null;
         }
 
-        protected override void RegisterDependencies(ContainerBuilder builder)
+        protected override void RegisterDependencies(ContainerBuilder builder, IntentParameters parameters)
         {
             builder.Register(a => new TestDependency("bob")).As<ITestDependency>();
         }
