@@ -21,7 +21,7 @@ namespace AlexaCore
 
         protected readonly Dictionary<string, object> ParameterQueues;
 
-        public ILambdaLogger Logger { get; }
+        //public ILambdaLogger Logger { get; }
 
 	    public string UserAccessToken => InputSession?.User?.AccessToken;
 
@@ -31,7 +31,7 @@ namespace AlexaCore
 
 	    public IntentParameters(ILambdaLogger logger, Session inputSession)
 	    {
-		    Logger = logger;
+		    //Logger = logger;
 
 		    InputSession = inputSession;
 

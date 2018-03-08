@@ -6,7 +6,13 @@
     <RootNamespace>AlexaCore</RootNamespace>
 		<PackageId>AlexaCore</PackageId>
 	  <Authors>boro2g</Authors>
-		<Description>Some helpers for streamlining Alexa C# Lambda functions</Description>
+		<Description>Some helpers for streamlining Alexa C# Lambda functions.
+
+Breaking changes:
+- AlexaIntent no longer has the parameters passed into the ctor
+- The old container is gone in favour of AutoFac
+- Registering dependencies is done via RegisterDependencies
+-- This enables ctor injection to work in any Intents</Description>
 	  <PackageTags>alexa lambda</PackageTags>
 	  <PackageProjectUrl>https://github.com/boro2g/AlexaCore</PackageProjectUrl>
   </PropertyGroup>

@@ -50,7 +50,7 @@ namespace AlexaCore
 
 		        innerResponse.SessionAttributes = parameters.SessionAttributes();
 
-		        parameters.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
+		        context.Logger.LogLine("Output: " + JsonConvert.SerializeObject(innerResponse));
 		    }
 
 		    using (new OperationTimer(context.Logger.LogLine, "Function complete", EnableOperationTimerLogging))
