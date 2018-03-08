@@ -35,24 +35,13 @@ namespace AlexaCore.Tests
 
             Assert.That(resolvedType.GetData(), Is.EqualTo("interface"));
         }
-
-        [Test]
-        public void WhenFunctionPreRegistersType_ItDoesntGetOverwrittenAndItCanBeResolvedOffTheContext()
-        {
-            var overwrittenDataStore = new TestFunctionTestRunner()
-                .PerformRegisterTypes(true)
-                .RunInitialFunction("LaunchIntent")
-                .Resolve<ITestDataStore>("globalItem");
-
-            Assert.That(overwrittenDataStore.Name, Is.EqualTo("override"));
-        }
-
+        
         [Test]
         public void ConstructorInjectionIntoIntent_CanBeResolved()
         {
             new TestFunctionTestRunner()
                 .RunInitialFunction("ConstructorInjectionIntent")
-                .VerifyOutputSpeechValue("bob");
+                .VerifyOutputSpeechValue("interface");
         }
     }
 }

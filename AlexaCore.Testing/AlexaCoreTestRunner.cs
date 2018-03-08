@@ -5,6 +5,7 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
 using Amazon.Lambda.TestUtilities;
+using Autofac;
 using NUnit.Framework;
 
 namespace AlexaCore.Testing
@@ -50,7 +51,7 @@ namespace AlexaCore.Testing
                 slots = new Dictionary<string, Slot>();
             }
 
-            AlexaContext.Container.Reset();
+            //AlexaContext.Container.Reset();
 
             RegisterTypes();
 
@@ -247,14 +248,14 @@ namespace AlexaCore.Testing
         {
             ValidateHasRun();
 
-            return AlexaContext.Container.Resolve<TType>();
+            return AlexaContext.DiContainer.Resolve<TType>();
         }
 
         public TType Resolve<TType>(string key)
         {
             ValidateHasRun();
 
-            return AlexaContext.Container.Resolve<TType>(key);
+            return AlexaContext.DiContainer.ResolveNamed<TType>(key);
         }
 
         public IntentParameters Parameters()

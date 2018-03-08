@@ -29,7 +29,7 @@ namespace AlexaCore.Tests.Function
         {
             if (_performRegisterTypes)
             {
-                AlexaContext.Container.RegisterType("globalItem", () => new TestDataStore("override"), true);
+                //AlexaContext.Container.RegisterType("globalItem", () => new TestDataStore("override"), true);
             }
         }
     }
