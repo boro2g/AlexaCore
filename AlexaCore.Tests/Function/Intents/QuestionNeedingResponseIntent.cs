@@ -8,7 +8,14 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class QuestionNeedingResponseIntent : IntentWithResponse
     {
+        private readonly IntentFactory _intentFactory;
+
         protected override IEnumerable<string> RequiredSlots => new[] { "TestSlot" };
+
+        public QuestionNeedingResponseIntent(IntentFactory intentFactory)
+        {
+            _intentFactory = intentFactory;
+        }
 		
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
@@ -31,7 +38,7 @@ namespace AlexaCore.Tests.Function.Intents
 
         private SkillResponse ExternalResponse()
         {
-            return AlexaContext.IntentFactory.GetIntent("LaunchIntent").GetResponse(Slots);
+            return _intentFactory.GetIntent("LaunchIntent").GetResponse(Slots);
         }
 
         private SkillResponse NoResponse()

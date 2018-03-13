@@ -4,6 +4,7 @@ using System.Linq;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
+using AlexaCore.Intents;
 using Amazon.Lambda.TestUtilities;
 using Autofac;
 using NUnit.Framework;
@@ -15,6 +16,11 @@ namespace AlexaCore.Testing
         private bool _hasRun;
 
         private AlexaFunction _function;
+
+        private IntentFactory IntentFactory()
+        {
+            return AlexaContext.Container.Resolve<IntentFactory>();
+        }
 
         public SkillResponse SkillResponse { get; private set; }
 
@@ -42,7 +48,7 @@ namespace AlexaCore.Testing
         public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null, Request request = null) 
         {
             _function = BuildFunction();
-
+            
             var lambdaContext = new TestLambdaContext
             {
                 Logger = new TestLambdaLogger(),
@@ -93,7 +99,7 @@ namespace AlexaCore.Testing
 
         public T VerifyIntentIsLoaded(string intentName)
         {
-            Assert.That(AlexaContext.IntentFactory.RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
+            Assert.That(IntentFactory().RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
 
             return Convert(this);
         }
@@ -151,7 +157,7 @@ namespace AlexaCore.Testing
 
             var text = GetOutputSpeechValue();
 
-            var counterPartText = ((PlainTextOutputSpeech)AlexaContext.IntentFactory.GetIntent(counterPartIntentName)
+            var counterPartText = ((PlainTextOutputSpeech)IntentFactory().GetIntent(counterPartIntentName)
                 .GetResponse(counterPartIntentSlots).Response.OutputSpeech).Text;
 
             Assert.That(text, Is.EqualTo(counterPartText));
@@ -265,7 +271,7 @@ namespace AlexaCore.Testing
         {
             ValidateHasRun();
 
-            return AlexaContext.Parameters;
+            return AlexaContext.Container.Resolve<IntentParameters>();
         }
     }
 }

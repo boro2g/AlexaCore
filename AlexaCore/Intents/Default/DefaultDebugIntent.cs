@@ -9,14 +9,23 @@ namespace AlexaCore.Intents.Default
 {
     public class DefaultDebugIntent : AlexaIntent
     {
-        public override string IntentName => AlexaContext.IntentNames.DefaultDebugIntent;
+        public IntentNames IntentNames { get; set; }
+
+        private readonly IntentFactory _intentFactory;
+
+        public override string IntentName => IntentNames.DefaultDebugIntent;
+
+        public DefaultDebugIntent(IntentFactory intentFactory)
+        {
+            _intentFactory = intentFactory;
+        }
 
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
-            return Tell($"Intents: {AlexaContext.IntentFactory.RegisteredIntents().JoinStringList()}.{Environment.NewLine}" +
-                        $"ApplicationParameters: {JsonConvert.SerializeObject(AlexaContext.Parameters.ApplicationParameters)}.{Environment.NewLine}" +
-                        $"CommandQueue: {JsonConvert.SerializeObject(AlexaContext.Parameters.CommandQueue)}.{Environment.NewLine}" +
-                        $"InputQueue: {JsonConvert.SerializeObject(AlexaContext.Parameters.InputQueue)}.{Environment.NewLine}");
+            return Tell($"Intents: {_intentFactory.RegisteredIntents().JoinStringList()}.{Environment.NewLine}" +
+                        $"ApplicationParameters: {JsonConvert.SerializeObject(Parameters.ApplicationParameters)}.{Environment.NewLine}" +
+                        $"CommandQueue: {JsonConvert.SerializeObject(Parameters.CommandQueue)}.{Environment.NewLine}" +
+                        $"InputQueue: {JsonConvert.SerializeObject(Parameters.InputQueue)}.{Environment.NewLine}");
         }
     }
 }

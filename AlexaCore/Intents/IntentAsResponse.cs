@@ -7,6 +7,8 @@ namespace AlexaCore.Intents
 {
 	public abstract class IntentAsResponse : AlexaIntent
 	{
+        public IntentFactory IntentFactory { get; set; }
+
 		protected SkillResponse FindPreviousQuestionResponse(Dictionary<string, Slot> slots)
 		{
 			var lastCommand = SelectLastCommand();
@@ -15,7 +17,7 @@ namespace AlexaCore.Intents
 
 			if (lastCommand != null && lastCommand.ExpectsResponse)
 			{
-                if (AlexaContext.IntentFactory.Intents()[lastCommand.IntentName] is IntentWithResponse intent)
+                if (IntentFactory.Intents()[lastCommand.IntentName] is IntentWithResponse intent)
                 {
                     Parameters.Logger.LogLine($"IntentAsResponse: {intent.IntentName}");
 
@@ -30,7 +32,7 @@ namespace AlexaCore.Intents
                 }
             }
 
-			return AlexaContext.IntentFactory.HelpIntent().GetResponse(slots);
+			return IntentFactory.HelpIntent().GetResponse(slots);
 		}
 
 		protected virtual CommandDefinition SelectLastCommand()

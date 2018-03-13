@@ -18,16 +18,14 @@ namespace AlexaCore
 
 		public Func<SkillResponse> Action { get; set; }
 
-		public string ParameterValue { get; }
-
 		public static PossibleResponse YesResponse(Func<SkillResponse> action)
 		{
-			return new PossibleResponse(AlexaContext.IntentNames.YesIntent, "yes", action);
+			return new PossibleResponse(new IntentNames().YesIntent, "yes", action);
 		}
 
-		public static PossibleResponse NoResponse(Func<SkillResponse> action, string parameterValue = "")
+		public static PossibleResponse NoResponse(Func<SkillResponse> action)
 		{
-			return new PossibleResponse(AlexaContext.IntentNames.NoIntent, "no", action);
+			return new PossibleResponse(new IntentNames().NoIntent, "no", action);
 		}
 	}
 }

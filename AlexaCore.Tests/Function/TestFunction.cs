@@ -13,7 +13,7 @@ namespace AlexaCore.Tests.Function
             return new TestFunctionIntentFactory();
         }
 
-        protected override SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+        protected override SkillResponse FunctionInit(IntentParameters parameters)
         {
             return null;
         }

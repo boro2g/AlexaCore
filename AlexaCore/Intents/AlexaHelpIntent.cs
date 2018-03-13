@@ -2,6 +2,8 @@
 {
     public abstract class AlexaHelpIntent : AlexaIntent
     {
-        public override string IntentName => AlexaContext.IntentNames.HelpIntent;
+        public IntentNames IntentNames { get; set; }
+
+        public override string IntentName => IntentNames.HelpIntent;
     }
 }

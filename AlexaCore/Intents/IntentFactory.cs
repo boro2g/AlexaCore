@@ -8,7 +8,8 @@ namespace AlexaCore.Intents
 {
     public abstract class IntentFactory
     {
-	    private static Dictionary<string, AlexaIntent> _intents;
+        private const string LaunchIntentKey = "LaunchIntent";
+        private static Dictionary<string, AlexaIntent> _intents;
         private AlexaHelpIntent _helpIntent;
         private AlexaIntent _launchIntent;
 
@@ -17,30 +18,32 @@ namespace AlexaCore.Intents
             _intents = null;
         }
 
-        public void RegisterIntents(ContainerBuilder builder)
+        internal void RegisterIntents(ContainerBuilder builder)
         {
             foreach (var intentType in ApplicationIntentTypes())
             {
-                builder.RegisterType(intentType).As<AlexaIntent>();
+                builder.RegisterType(intentType).As<AlexaIntent>().PropertiesAutowired();
             }
 
-            builder.RegisterType<DefaultCancelIntent>();
+            builder.RegisterType<DefaultCancelIntent>().PropertiesAutowired();
 
-            builder.RegisterType<DefaultDebugIntent>();
+            builder.RegisterType<DefaultDebugIntent>().PropertiesAutowired();
 
-            builder.RegisterType<DefaultStopIntent>();
+            builder.RegisterType<DefaultStopIntent>().PropertiesAutowired();
 
             builder.RegisterType(LaunchIntentType())
-                .Named<AlexaIntent>("LaunchIntent");
+                .Named<AlexaIntent>(LaunchIntentKey).PropertiesAutowired();
 
-            builder.RegisterType(HelpIntentType()).As<AlexaHelpIntent>();
+            builder.RegisterType(HelpIntentType()).As<AlexaHelpIntent>().PropertiesAutowired();
         }
 
-        public void BuildIntents(IntentParameters intentParameters, IContainer container)
+        internal void BuildIntents(IntentParameters intentParameters, IContainer container)
         {
             if (_intents == null)
             {
                 var registeredIntents = container.Resolve<IEnumerable<AlexaIntent>>();
+
+                var intentNames = container.Resolve<IntentNames>();
 
                 var dictionary = new Dictionary<string, AlexaIntent>();
 
@@ -49,26 +52,26 @@ namespace AlexaCore.Intents
                     dictionary[intent.IntentName] = intent;
                 }
 
-                if (!dictionary.ContainsKey(AlexaContext.IntentNames.CancelIntent))
+                if (!dictionary.ContainsKey(intentNames.CancelIntent))
                 {
-                    dictionary[AlexaContext.IntentNames.CancelIntent] = container.Resolve<DefaultCancelIntent>();
+                    dictionary[intentNames.CancelIntent] = container.Resolve<DefaultCancelIntent>();
                 }
 
-                if (!dictionary.ContainsKey(AlexaContext.IntentNames.StopIntent))
+                if (!dictionary.ContainsKey(intentNames.StopIntent))
                 {
-                    dictionary[AlexaContext.IntentNames.StopIntent] = container.Resolve<DefaultStopIntent>();
+                    dictionary[intentNames.StopIntent] = container.Resolve<DefaultStopIntent>();
                 }
 
-                if (IncludeDefaultDebugIntent() && !dictionary.ContainsKey(AlexaContext.IntentNames.DefaultDebugIntent))
+                if (IncludeDefaultDebugIntent() && !dictionary.ContainsKey(intentNames.DefaultDebugIntent))
                 {
-                    dictionary[AlexaContext.IntentNames.DefaultDebugIntent] = container.Resolve<DefaultDebugIntent>();
+                    dictionary[intentNames.DefaultDebugIntent] = container.Resolve<DefaultDebugIntent>();
                 }
 
                 _helpIntent = container.Resolve<AlexaHelpIntent>();
 
                 dictionary[_helpIntent.IntentName] = _helpIntent;
 
-                _launchIntent = container.ResolveNamed<AlexaIntent>("LaunchIntent");
+                _launchIntent = container.ResolveNamed<AlexaIntent>(LaunchIntentKey);
 
                 dictionary[_launchIntent.IntentName] = _launchIntent;
 

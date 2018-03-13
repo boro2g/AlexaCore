@@ -34,7 +34,7 @@ namespace AlexaCore
 
                 context.Logger.LogLine("Input: " + JsonConvert.SerializeObject(input));
 
-                var initResponse = FunctionInit(AlexaContext, parameters);
+                var initResponse = FunctionInit(parameters);
 
                 if (initResponse != null)
                 {
@@ -69,7 +69,7 @@ namespace AlexaCore
 
             _container = BuildContainer(_intentFactory, parameters);
 
-            AlexaContext = new AlexaContext(_intentFactory, IntentNames(), parameters, _container);
+            AlexaContext = new AlexaContext(_container);
 
             _intentFactory.BuildIntents(parameters, _container);
 
@@ -79,6 +79,12 @@ namespace AlexaCore
         private IContainer BuildContainer(IntentFactory intentFactory, IntentParameters parameters)
         {
             var builder = new ContainerBuilder();
+
+            builder.Register(a => parameters);
+
+            builder.Register(a => intentFactory).SingleInstance();
+
+            builder.Register(a => IntentNames() ?? new IntentNames()).SingleInstance();
 
             intentFactory.RegisterIntents(builder);
 
@@ -97,7 +103,7 @@ namespace AlexaCore
             return new IntentParameters(logger, session);
         }
 
-        protected virtual SkillResponse FunctionInit(AlexaContext alexaContext, IntentParameters parameters)
+        protected virtual SkillResponse FunctionInit(IntentParameters parameters)
         {
             return null;
         }

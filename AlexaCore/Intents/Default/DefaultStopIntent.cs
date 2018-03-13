@@ -6,7 +6,9 @@ namespace AlexaCore.Intents.Default
 {
 	public class DefaultStopIntent : AlexaIntent
 	{
-		public override string IntentName => AlexaContext.IntentNames.StopIntent;
+	    public IntentNames IntentNames { get; set; }
+
+        public override string IntentName => IntentNames.StopIntent;
 
 		public override bool ShouldEndSession => true;
 
