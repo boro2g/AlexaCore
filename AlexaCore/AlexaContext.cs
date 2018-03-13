@@ -4,7 +4,7 @@ using Autofac;
 [assembly: InternalsVisibleTo("AlexaCore.Testing")]
 namespace AlexaCore
 {
-    internal class AlexaContext
+    public class AlexaContext
     {
         public static IContainer Container { get; private set; }
 
