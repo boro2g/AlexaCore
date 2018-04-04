@@ -9,7 +9,7 @@ namespace AlexaCore.Content
 {
     public interface IContentService<T> where T : IIntentContent
     {
-        string LoadAndFormatContent(string key, string defaultText, RequestParameters additionalRequestParameters, params string[] parameters);
+        ContentResponse LoadAndFormatContent(string key, string defaultText, RequestParameters additionalRequestParameters, params string[] parameters);
     }
 
     public abstract class ContentService<T> : IContentService<T> where T : IIntentContent
@@ -125,7 +125,7 @@ namespace AlexaCore.Content
             }
         }
 
-        public string LoadAndFormatContent(string key, string defaultText, RequestParameters additionalRequestParameters = null, params string[] parameters)
+        public ContentResponse LoadAndFormatContent(string key, string defaultText, RequestParameters additionalRequestParameters = null, params string[] parameters)
         {
             string cookieKey = "__cookies";
 
@@ -138,19 +138,24 @@ namespace AlexaCore.Content
                 cookieList = JsonConvert.DeserializeObject<List<CookieValue>>(cookieValues);
             }
 
-            var contentResults = LoadContent(key, defaultText, _userId, additionalRequestParameters, cookieList, out var responseCookies)?.Content;
+            var requestResponse = LoadContent(key, defaultText, _userId, additionalRequestParameters, cookieList, out var responseCookies);
 
             if (responseCookies != null && responseCookies.Any())
             {
                 _applicationParameters.AddOrUpdateValue(cookieKey, JsonConvert.SerializeObject(responseCookies));
             }
+
+            var contentResponse = new ContentResponse(requestResponse, key);
             
-            if (String.IsNullOrWhiteSpace(contentResults))
+            if (String.IsNullOrWhiteSpace(requestResponse?.Content))
             {
-                return String.Format(defaultText, parameters);
+                contentResponse.FormattedContent = String.Format(defaultText, parameters);
+                contentResponse.DefaultText = true;
             }
 
-            return String.Format(contentResults, parameters);
+            contentResponse.FormattedContent = String.Format(requestResponse?.Content, parameters);
+
+            return contentResponse;
         }
     }
 }

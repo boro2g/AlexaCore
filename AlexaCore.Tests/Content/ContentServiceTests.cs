@@ -26,7 +26,7 @@ namespace AlexaCore.Tests.Content
 
             var result = contentService.LoadAndFormatContent("HelpIntent", "default text");
 
-            Assert.That(result, Is.EqualTo(responseText));
+            Assert.That(result.FormattedContent, Is.EqualTo(responseText));
         }
 
         [Test]

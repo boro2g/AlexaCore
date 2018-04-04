@@ -4,5 +4,6 @@
     {
         string Content { get; }
         bool Default { get; }
+        bool ShouldEndSession { get; }
     }
 }
