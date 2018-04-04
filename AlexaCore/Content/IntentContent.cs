@@ -5,6 +5,7 @@
         public IntentContent()
         {
             Default = false;
+	        ShouldEndSession = false;
         }
 
         public string IntentName { get; set; }
@@ -13,5 +14,6 @@
         public int FormatSlots { get; set; }
         public string Key { get; set; }
         public bool Default { get; set; }
+		public bool ShouldEndSession { get; set; }
     }
 }
