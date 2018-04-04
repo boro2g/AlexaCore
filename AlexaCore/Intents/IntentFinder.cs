@@ -7,8 +7,7 @@ namespace AlexaCore.Intents
 {
     public static class IntentFinder
     {
-	    public static IEnumerable<AlexaIntent> FindIntents(IEnumerable<Assembly> sourceAssemblies, IntentParameters intentParameters,
-		    Func<AlexaIntent, bool> exclusionFilter = null)
+	    public static IEnumerable<AlexaIntent> FindIntents(IEnumerable<Assembly> sourceAssemblies, Func<AlexaIntent, bool> exclusionFilter = null)
 	    {
 		    var intents = new List<AlexaIntent>();
 
@@ -17,7 +16,7 @@ namespace AlexaCore.Intents
 			    var intentBases = assembly.DefinedTypes
 					.Where(type => typeof(AlexaIntent).GetTypeInfo().IsAssignableFrom(type.AsType()) && !type.IsAbstract);
 
-			    intents.AddRange(intentBases.Select(intent => Activator.CreateInstance(intent.UnderlyingSystemType, intentParameters) as AlexaIntent));
+			    intents.AddRange(intentBases.Select(intent => Activator.CreateInstance(intent.UnderlyingSystemType) as AlexaIntent));
 		    }
 
 		    if (exclusionFilter != null)
@@ -27,5 +26,25 @@ namespace AlexaCore.Intents
 
 		    return intents;
 	    }
+
+        public static IEnumerable<Type> FindIntentTypes(IEnumerable<Assembly> sourceAssemblies, Func<Type, bool> exclusionFilter = null)
+        {
+            var intents = new List<Type>();
+
+            foreach (var assembly in sourceAssemblies)
+            {
+                var intentBases = assembly.DefinedTypes
+                    .Where(type => typeof(AlexaIntent).GetTypeInfo().IsAssignableFrom(type.AsType()) && !type.IsAbstract);
+
+                intents.AddRange(intentBases.Select(intent => intent));
+            }
+
+            if (exclusionFilter != null)
+            {
+                intents = intents.Where(exclusionFilter).ToList();
+            }
+
+            return intents;
+        }
     }
 }

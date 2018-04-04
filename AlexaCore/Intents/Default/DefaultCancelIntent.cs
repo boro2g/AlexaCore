@@ -6,21 +6,15 @@ namespace AlexaCore.Intents.Default
 {
     public class DefaultCancelIntent : AlexaIntent
 	{
-		public DefaultCancelIntent(IntentParameters intentParameters) : base(intentParameters)
-		{
+	    public IntentNames IntentNames { get; set; }
 
-		}
-
-		public override string IntentName => AlexaContext.IntentNames.HelpIntent;
+        public override string IntentName => IntentNames.CancelIntent;
 
 		public override bool ShouldEndSession => true;
 
 		protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
 		{
-			return BuildResponse(new PlainTextOutputSpeech
-			{
-				Text = "Goodbye"
-			});
+		    return Tell("Goodbye");
 		}
 	}
 }

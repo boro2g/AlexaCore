@@ -7,10 +7,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class ParameterUpdaterIntent : AlexaIntent
     {
-        public ParameterUpdaterIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-        
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             Parameters.ApplicationParameters.Update(new ApplicationParameter("name", "value updated"), a => a.Name == "name", true);

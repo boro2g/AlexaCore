@@ -4,7 +4,9 @@ using System.Linq;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
+using AlexaCore.Intents;
 using Amazon.Lambda.TestUtilities;
+using Autofac;
 using NUnit.Framework;
 
 namespace AlexaCore.Testing
@@ -13,7 +15,12 @@ namespace AlexaCore.Testing
     {
         private bool _hasRun;
 
-        private readonly AlexaFunction _function;
+        private AlexaFunction _function;
+
+        private IntentFactory IntentFactory()
+        {
+            return AlexaContext.Container.Resolve<IntentFactory>();
+        }
 
         public SkillResponse SkillResponse { get; private set; }
 
@@ -38,8 +45,10 @@ namespace AlexaCore.Testing
 
         public abstract AlexaFunction BuildFunction();
         
-        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null) 
+        public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null, Request request = null) 
         {
+            _function = BuildFunction();
+            
             var lambdaContext = new TestLambdaContext
             {
                 Logger = new TestLambdaLogger(),
@@ -50,16 +59,17 @@ namespace AlexaCore.Testing
                 slots = new Dictionary<string, Slot>();
             }
 
-            AlexaContext.Container.Reset();
-
-            RegisterTypes();
-
+            if (request == null)
+            {
+                request = new IntentRequest {Intent = new Intent {Name = intentName, Slots = slots}};
+            }
+            
             var response =
                 _function.FunctionHandler(
                     new SkillRequest
                     {
                         Session = session ?? new Session { New = true, SessionId = newSessionId },
-                        Request = new IntentRequest { Intent = new Intent { Name = intentName, Slots = slots} },
+                        Request = request,
                         Context = context
                     }, lambdaContext);
 
@@ -70,14 +80,14 @@ namespace AlexaCore.Testing
             return Convert(this);
         }
 
+        public virtual void UpdateFunction(AlexaFunction function)
+        {
+            _function = function;
+        }
+
         public virtual T Convert(AlexaCoreTestRunner<T> alexaCoreTestRunner)
         {
             return alexaCoreTestRunner as T;
-        }
-
-        protected virtual void RegisterTypes()
-        {
-
         }
         
         public T RunAgain(string intentName, Dictionary<string, Slot> slots = null)
@@ -89,7 +99,7 @@ namespace AlexaCore.Testing
 
         public T VerifyIntentIsLoaded(string intentName)
         {
-            Assert.That(AlexaContext.IntentFactory.RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
+            Assert.That(IntentFactory().RegisteredIntents().Contains(intentName), Is.True, $"AlexaContext should contain intent: {intentName}");
 
             return Convert(this);
         }
@@ -147,7 +157,7 @@ namespace AlexaCore.Testing
 
             var text = GetOutputSpeechValue();
 
-            var counterPartText = ((PlainTextOutputSpeech)AlexaContext.IntentFactory.GetIntent(counterPartIntentName)
+            var counterPartText = ((PlainTextOutputSpeech)IntentFactory().GetIntent(counterPartIntentName)
                 .GetResponse(counterPartIntentSlots).Response.OutputSpeech).Text;
 
             Assert.That(text, Is.EqualTo(counterPartText));
@@ -254,14 +264,14 @@ namespace AlexaCore.Testing
         {
             ValidateHasRun();
 
-            return AlexaContext.Container.Resolve<TType>(key);
+            return AlexaContext.Container.ResolveNamed<TType>(key);
         }
 
         public IntentParameters Parameters()
         {
             ValidateHasRun();
 
-            return AlexaContext.Parameters;
+            return AlexaContext.Container.Resolve<IntentParameters>();
         }
     }
 }

@@ -46,5 +46,13 @@ namespace AlexaCore.Tests
 
             Assert.That(overwrittenDataStore.Name, Is.EqualTo("override"));
         }
+
+        [Test]
+        public void ConstructorInjectionIntoIntent_CanBeResolved()
+        {
+            new TestFunctionTestRunner()
+                .RunInitialFunction("ConstructorInjectionIntent")
+                .VerifyOutputSpeechValue("interface");
+        }
     }
 }

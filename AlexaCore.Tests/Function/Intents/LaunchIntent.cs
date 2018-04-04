@@ -7,10 +7,6 @@ namespace AlexaCore.Tests.Function.Intents
 {
     class LaunchIntent : AlexaIntent
     {
-        public LaunchIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-
         public override string IntentName => "LaunchIntent";
 
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)

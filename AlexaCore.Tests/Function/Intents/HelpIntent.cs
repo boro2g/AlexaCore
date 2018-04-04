@@ -5,13 +5,9 @@ using AlexaCore.Intents;
 
 namespace AlexaCore.Tests.Function.Intents
 {
-    class HelpIntent : AlexaHelpIntent
+    public class HelpIntent : AlexaHelpIntent
     {
-        public HelpIntent(IntentParameters parameters) : base(parameters)
-        {
-        }
-        
-        protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
+	    protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
             return Tell("HelpIntent");
         }

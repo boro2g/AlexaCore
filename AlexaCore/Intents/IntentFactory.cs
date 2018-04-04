@@ -1,57 +1,109 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AlexaCore.Intents.Default;
+using Autofac;
 
 namespace AlexaCore.Intents
 {
     public abstract class IntentFactory
     {
-	    private static Dictionary<string, AlexaIntent> _intents;
+        private const string LaunchIntentKey = "LaunchIntent";
+        private static Dictionary<string, AlexaIntent> _intents;
+        private AlexaHelpIntent _helpIntent;
+        private AlexaIntent _launchIntent;
 
         protected IntentFactory()
         {
             _intents = null;
         }
 
-	    public Dictionary<string, AlexaIntent> Intents(IntentParameters intentParameters)
-	    {
-		    if (_intents == null)
-		    {
-			    var intents = ApplicationIntents(intentParameters);
+        internal void RegisterIntents(ContainerBuilder builder)
+        {
+            foreach (var intentType in ApplicationIntentTypes())
+            {
+                builder.RegisterType(intentType).As<AlexaIntent>().PropertiesAutowired();
+            }
 
-			    var dictionary = new Dictionary<string, AlexaIntent>();
+            builder.RegisterType<DefaultCancelIntent>().PropertiesAutowired();
 
-			    foreach (var intent in intents)
-			    {
-				    dictionary[intent.IntentName] = intent;
-			    }
+            builder.RegisterType<DefaultDebugIntent>().PropertiesAutowired();
 
-			    if (!dictionary.ContainsKey(AlexaContext.IntentNames.CancelIntent))
-			    {
-				    dictionary[AlexaContext.IntentNames.CancelIntent] = CancelIntent(intentParameters);
-			    }
+            builder.RegisterType<DefaultStopIntent>().PropertiesAutowired();
 
-			    if (!dictionary.ContainsKey(AlexaContext.IntentNames.StopIntent))
-			    {
-				    dictionary[AlexaContext.IntentNames.StopIntent] = StopIntent(intentParameters);
-			    }
+            builder.RegisterType(LaunchIntentType())
+                .Named<AlexaIntent>(LaunchIntentKey).PropertiesAutowired();
 
-		        if (IncludeDefaultDebugIntent() && !dictionary.ContainsKey(AlexaContext.IntentNames.DefaultDebugIntent))
-		        {
-		            dictionary[AlexaContext.IntentNames.DefaultDebugIntent] = DefaultDebugIntent(intentParameters);
+            builder.RegisterType(HelpIntentType()).As<AlexaHelpIntent>().PropertiesAutowired();
+        }
+
+        internal void BuildIntents(IntentParameters intentParameters, IContainer container)
+        {
+            if (_intents == null)
+            {
+                var registeredIntents = container.Resolve<IEnumerable<AlexaIntent>>();
+
+                var intentNames = container.Resolve<IntentNames>();
+
+                var dictionary = new Dictionary<string, AlexaIntent>();
+
+                foreach (var intent in registeredIntents)
+                {
+                    dictionary[intent.IntentName] = intent;
                 }
 
-				_intents = dictionary;
-		    }
+                if (!dictionary.ContainsKey(intentNames.CancelIntent))
+                {
+                    dictionary[intentNames.CancelIntent] = container.Resolve<DefaultCancelIntent>();
+                }
 
+                if (!dictionary.ContainsKey(intentNames.StopIntent))
+                {
+                    dictionary[intentNames.StopIntent] = container.Resolve<DefaultStopIntent>();
+                }
+
+                if (IncludeDefaultDebugIntent() && !dictionary.ContainsKey(intentNames.DefaultDebugIntent))
+                {
+                    dictionary[intentNames.DefaultDebugIntent] = container.Resolve<DefaultDebugIntent>();
+                }
+
+                _helpIntent = container.Resolve<AlexaHelpIntent>();
+
+                dictionary[_helpIntent.IntentName] = _helpIntent;
+
+                _launchIntent = container.ResolveNamed<AlexaIntent>(LaunchIntentKey);
+
+                dictionary[_launchIntent.IntentName] = _launchIntent;
+
+                foreach (var key in dictionary.Keys)
+                {
+                    dictionary[key].SetParameters(intentParameters);
+                }
+
+                _intents = dictionary;
+            }
+        }
+
+        public Dictionary<string, AlexaIntent> Intents()
+	    {
 		    return _intents;
 	    }
 
-	    protected abstract List<AlexaIntent> ApplicationIntents(IntentParameters intentParameters);
+        protected abstract List<Type> ApplicationIntentTypes();
 
-	    public abstract AlexaIntent LaunchIntent(IntentParameters intentParameters);
+        public virtual AlexaIntent LaunchIntent()
+        {
+            return _launchIntent;
+        }
 
-        public abstract AlexaHelpIntent HelpIntent(IntentParameters intentParameters);
+        public virtual AlexaHelpIntent HelpIntent()
+        {
+            return _helpIntent;
+        }
+
+        public abstract Type LaunchIntentType();
+
+        public abstract Type HelpIntentType();
 
         public AlexaIntent GetIntent(string intentName)
 	    {
@@ -72,20 +124,5 @@ namespace AlexaCore.Intents
 	    {
 		    return _intents?.Keys.Select(a => a) ?? new string[0];
 	    }
-
-	    protected virtual AlexaIntent CancelIntent(IntentParameters intentParameters)
-	    {
-		    return new DefaultCancelIntent(intentParameters);
-	    }
-
-	    protected virtual AlexaIntent StopIntent(IntentParameters intentParameters)
-	    {
-		    return new DefaultStopIntent(intentParameters);
-	    }
-
-        protected virtual AlexaIntent DefaultDebugIntent(IntentParameters intentParameters)
-        {
-            return new DefaultDebugIntent(intentParameters);
-        }
     }
 }
