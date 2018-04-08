@@ -36,19 +36,19 @@ namespace AlexaCore.Tests.Function.Intents
             yield return new PossibleResponse("ExternalResponseIntent", "external", ExternalResponse);
         }
 
-        private SkillResponse ExternalResponse()
+        private IntentResponse ExternalResponse()
         {
-            return _intentFactory.GetIntent("LaunchIntent").GetResponse(Slots);
+            return new IntentResponse(_intentFactory.GetIntent("LaunchIntent").GetResponse(Slots), false);
         }
 
-        private SkillResponse NoResponse()
+        private IntentResponse NoResponse()
         {
-            return Tell($"No response");
+            return new IntentResponse(Tell($"No response"), false);
         }
 
-        private SkillResponse YesResponse()
+        private IntentResponse YesResponse()
         {
-            return Tell($"Yes response");
+            return new IntentResponse(Tell($"Yes response"), false);
         }
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Alexa.NET.Request;
-using Alexa.NET.Response;
 
 namespace AlexaCore.Intents
 {
@@ -9,7 +8,7 @@ namespace AlexaCore.Intents
 	{
         public IntentFactory IntentFactory { get; set; }
 
-		protected SkillResponse FindPreviousQuestionResponse(Dictionary<string, Slot> slots)
+		protected IntentResponse FindPreviousQuestionResponse(Dictionary<string, Slot> slots)
 		{
 			var lastCommand = SelectLastCommand();
 
@@ -28,11 +27,11 @@ namespace AlexaCore.Intents
                         return matchedResponse.Action();
                     }
 
-                    return Tell(intent.PossibleResponsesAsText());
+                    return new IntentResponse(Tell(intent.PossibleResponsesAsText()), false);
                 }
             }
 
-			return IntentFactory.HelpIntent().GetResponse(slots);
+			return new IntentResponse(IntentFactory.HelpIntent().GetResponse(slots), false);
 		}
 
 		protected virtual CommandDefinition SelectLastCommand()
