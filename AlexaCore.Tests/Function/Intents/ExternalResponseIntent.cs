@@ -9,7 +9,7 @@ namespace AlexaCore.Tests.Function.Intents
     {
         protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
         {
-            return FindPreviousQuestionResponse(slots);
+            return FindPreviousQuestionResponse(slots).SkillResponse;
         }
     }
 }

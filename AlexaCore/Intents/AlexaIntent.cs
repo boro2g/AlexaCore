@@ -81,7 +81,11 @@ namespace AlexaCore.Intents
 
 		protected virtual IEnumerable<string> RequiredSlots => new string[0];
 
-		public virtual bool ShouldEndSession { get; set; } = false;
+		public virtual bool ShouldEndSession
+		{
+		    get;
+		    set;
+		} = false;
 
 		protected abstract SkillResponse GetResponseInternal(Dictionary<string, Slot> slots);
 
