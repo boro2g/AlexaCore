@@ -90,11 +90,23 @@ namespace AlexaCore.Testing
             return alexaCoreTestRunner as T;
         }
         
-        public T RunAgain(string intentName, Dictionary<string, Slot> slots = null)
+        public T RunAgain(string intentName, Dictionary<string, Slot> slots = null, int iterations = 1)
         {
             ValidateHasRun();
 
-            return RunInitialFunction(intentName, Session.SessionId, Session, slots: slots);
+            T response = null;
+
+            if (iterations < 1)
+            {
+                iterations = 1;
+            }
+
+            for (var i = 0; i < iterations; i++)
+            {
+                response = RunInitialFunction(intentName, Session.SessionId, Session, slots: slots);
+            }
+
+            return response;
         }
 
         public T VerifyIntentIsLoaded(string intentName)
@@ -144,6 +156,20 @@ namespace AlexaCore.Testing
 
                 Assert.That(text.Contains(valueToCheck), Is.True, $"Output text doesn't contain {value}. Output text is: {text}");
             }
+
+            return Convert(this);
+        }
+
+        public T VerifyShouldEndSession(bool expected)
+        {
+            Assert.That(SkillResponse.Response.ShouldEndSession, Is.EqualTo(expected), $"Expected 'EndSession' to be {expected} but was {SkillResponse.Response.ShouldEndSession}");
+
+            return Convert(this);
+        }
+
+        public T VerifyOutputIsNotEmpty()
+        {
+            Assert.That(GetOutputSpeechValue(), Is.Not.EqualTo(""), "Output speech should not be empty");
 
             return Convert(this);
         }
