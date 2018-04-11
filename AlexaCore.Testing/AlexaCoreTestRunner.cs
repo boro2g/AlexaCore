@@ -44,7 +44,7 @@ namespace AlexaCore.Testing
         }
 
         public abstract AlexaFunction BuildFunction();
-        
+
         public T RunInitialFunction(string intentName, string newSessionId = "", Session session = null, Context context = null, Dictionary<string, Slot> slots = null, Request request = null) 
         {
             _function = BuildFunction();
@@ -89,7 +89,7 @@ namespace AlexaCore.Testing
         {
             return alexaCoreTestRunner as T;
         }
-        
+
         public T RunAgain(string intentName, Dictionary<string, Slot> slots = null, int iterations = 1)
         {
             ValidateHasRun();
@@ -107,6 +107,18 @@ namespace AlexaCore.Testing
             }
 
             return response;
+        }
+
+        public T RunAllIntents(Dictionary<string, Slot> slots = null)
+        {
+            ValidateHasRun();
+
+            foreach (var intent in IntentFactory().RegisteredIntents())
+            {
+                RunInitialFunction(intent, slots: slots);
+            }
+
+            return Convert(this);
         }
 
         public T VerifyIntentIsLoaded(string intentName)
@@ -298,6 +310,16 @@ namespace AlexaCore.Testing
             ValidateHasRun();
 
             return AlexaContext.Container.Resolve<IntentParameters>();
+        }
+
+        public static Dictionary<string, Slot> BuildSlots(Slot slot = null)
+        {
+            if (slot == null)
+            {
+                return new Dictionary<string, Slot>();
+            }
+
+            return new Dictionary<string, Slot> {{slot.Name, slot}};
         }
     }
 }

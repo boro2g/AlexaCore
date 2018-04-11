@@ -30,5 +30,14 @@ namespace AlexaCore.Tests
 
             Assert.That(response.Contains("Expected slots are: TestSlot"), Is.True);
         }
+
+        [Test]
+        public void WhenSingleSlotIsUsed_CorrectValueIsUsed()
+        {
+            new TestFunctionTestRunner()
+                .RunInitialFunction("SlotIntent",
+                    slots: TestFunctionTestRunner.BuildSlots(new Slot {Name = "TestSlot", Value = "TestSlotValue"}))
+                .VerifyOutputSpeechValue("Slot value: TestSlotValue");
+        }
     }
 }
