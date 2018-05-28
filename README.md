@@ -26,10 +26,7 @@ class TestFunction : AlexaFunction
 ```csharp
 class DemoIntent : AlexaIntent
 {
-    public DemoIntent(IntentParameters parameters) : base(parameters)
-    {
-    }
-
+    //optional IntentName, otherwise the class name is used
     public override string IntentName => "DemoIntent";
 
     protected override SkillResponse GetResponseInternal(Dictionary<string, Slot> slots)
