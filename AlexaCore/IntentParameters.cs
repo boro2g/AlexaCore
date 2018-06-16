@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using Alexa.NET.Request;
 using Amazon.Lambda.Core;
 
@@ -12,6 +14,7 @@ namespace AlexaCore
 
         private const string ParametersQueueKey = "Parameters";
 
+        
         public PersistentQueue<InputItem> InputQueue => GetParameter<PersistentQueue<InputItem>>(InputsQueueKey);
 
         public PersistentQueue<CommandDefinition> CommandQueue => GetParameter<PersistentQueue<CommandDefinition>>(CommandsQueueKey);
@@ -20,6 +23,8 @@ namespace AlexaCore
             GetParameter<PersistentQueue<ApplicationParameter>>(ParametersQueueKey);
 
         protected readonly Dictionary<string, object> ParameterQueues;
+
+        public Dictionary<string, object> DeviceSupportedInterfaces { get; set; }
 
         public ILambdaLogger Logger { get; }
 
@@ -68,6 +73,11 @@ namespace AlexaCore
         public T GetParameter<T>(string key) where T : class
         {
             return ParameterQueues[key] as T;
+        }
+
+        internal void AddDeviceSupportedInterfaces(AlexaSystem system)
+        {
+            this.DeviceSupportedInterfaces = system?.Device?.SupportedInterfaces;
         }
 
         public Dictionary<string, object> SessionAttributes()

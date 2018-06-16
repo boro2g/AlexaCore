@@ -67,6 +67,12 @@ namespace AlexaCore
 
             var parameters = BuildParameters(context.Logger, input.Session);
 
+            AlexaSystem system = input.Context?.System;
+            if (system != null)
+            {
+                parameters.AddDeviceSupportedInterfaces(system);
+            }
+
             _container = BuildContainer(_intentFactory, parameters);
 
             AlexaContext = new AlexaContext(_container);
@@ -75,6 +81,8 @@ namespace AlexaCore
 
             return parameters;
         }
+
+        
 
         private IContainer BuildContainer(IntentFactory intentFactory, IntentParameters parameters)
         {
