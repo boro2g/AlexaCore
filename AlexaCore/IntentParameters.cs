@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Collections.Generic;
 using Alexa.NET.Request;
 using Amazon.Lambda.Core;
 
@@ -13,7 +11,6 @@ namespace AlexaCore
         private const string CommandsQueueKey = "Commands";
 
         private const string ParametersQueueKey = "Parameters";
-
         
         public PersistentQueue<InputItem> InputQueue => GetParameter<PersistentQueue<InputItem>>(InputsQueueKey);
 
@@ -24,23 +21,29 @@ namespace AlexaCore
 
         protected readonly Dictionary<string, object> ParameterQueues;
 
-        public Dictionary<string, object> DeviceSupportedInterfaces { get; set; }
+        public Dictionary<string, object> DeviceSupportedInterfaces { get; }
+
+        public string DeviceId { get; }
 
         public ILambdaLogger Logger { get; }
 
-	    public string UserAccessToken => InputSession?.User?.AccessToken;
+        public string UserAccessToken => InputSession?.User?.AccessToken;
 
-		public string UserId => InputSession?.User?.UserId;
+        public string UserId => InputSession?.User?.UserId;
 
-		private Session InputSession { get; }
+        private Session InputSession { get; }
 
-	    public IntentParameters(ILambdaLogger logger, Session inputSession)
+        public IntentParameters(ILambdaLogger logger, Session inputSession, Device systemDevice)
 	    {
 		    Logger = logger;
 
 		    InputSession = inputSession;
 
-		    if (InputSession.Attributes == null)
+	        DeviceSupportedInterfaces = systemDevice?.SupportedInterfaces ?? new Dictionary<string, object>();
+
+	        DeviceId = systemDevice?.DeviceID ?? "";
+
+            if (InputSession.Attributes == null)
 		    {
 			    InputSession.Attributes = new Dictionary<string, object>();
 		    }
@@ -74,12 +77,7 @@ namespace AlexaCore
         {
             return ParameterQueues[key] as T;
         }
-
-        internal void AddDeviceSupportedInterfaces(AlexaSystem system)
-        {
-            this.DeviceSupportedInterfaces = system?.Device?.SupportedInterfaces;
-        }
-
+       
         public Dictionary<string, object> SessionAttributes()
 	    {
 		    return InputSession.Attributes;

@@ -65,14 +65,8 @@ namespace AlexaCore
         {
             _intentFactory = IntentFactory();
 
-            var parameters = BuildParameters(context.Logger, input.Session);
-
-            AlexaSystem system = input.Context?.System;
-            if (system != null)
-            {
-                parameters.AddDeviceSupportedInterfaces(system);
-            }
-
+            var parameters = BuildParameters(context.Logger, input.Session, input.Context?.System?.Device);
+            
             _container = BuildContainer(_intentFactory, parameters);
 
             AlexaContext = new AlexaContext(_container);
@@ -81,8 +75,6 @@ namespace AlexaCore
 
             return parameters;
         }
-
-        
 
         private IContainer BuildContainer(IntentFactory intentFactory, IntentParameters parameters)
         {
@@ -106,9 +98,9 @@ namespace AlexaCore
 
         }
 
-        protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session)
+        protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session, Device systemDevice)
         {
-            return new IntentParameters(logger, session);
+            return new IntentParameters(logger, session, systemDevice);
         }
 
         protected virtual SkillResponse FunctionInit(IntentParameters parameters)
