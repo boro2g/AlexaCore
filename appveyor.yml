@@ -1,0 +1,8 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+build_script:
+- ps: >-    
+    dotnet --version
+    dotnet restore AlexaCore.sln
+    dotnet build AlexaCore.sln
+    dotnet test AlexaCore.Tests

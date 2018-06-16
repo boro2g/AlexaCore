@@ -65,8 +65,8 @@ namespace AlexaCore
         {
             _intentFactory = IntentFactory();
 
-            var parameters = BuildParameters(context.Logger, input.Session);
-
+            var parameters = BuildParameters(context.Logger, input.Session, input.Context?.System?.Device);
+            
             _container = BuildContainer(_intentFactory, parameters);
 
             AlexaContext = new AlexaContext(_container);
@@ -98,9 +98,9 @@ namespace AlexaCore
 
         }
 
-        protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session)
+        protected virtual IntentParameters BuildParameters(ILambdaLogger logger, Session session, Device systemDevice)
         {
-            return new IntentParameters(logger, session);
+            return new IntentParameters(logger, session, systemDevice);
         }
 
         protected virtual SkillResponse FunctionInit(IntentParameters parameters)

@@ -27,7 +27,7 @@ namespace AlexaCore.Tests.Function
             builder.Register(a => new TestDataStore("Function")).Named<ITestDataStore>("globalItem");
         }
 
-        protected override IntentParameters BuildParameters(ILambdaLogger logger, Session session)
+        protected override IntentParameters BuildParameters(ILambdaLogger logger, Session session, Device systemDevice)
         {
             return new TestIntentParameters(logger, session);
         }

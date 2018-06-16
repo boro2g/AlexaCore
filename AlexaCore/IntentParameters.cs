@@ -11,7 +11,7 @@ namespace AlexaCore
         private const string CommandsQueueKey = "Commands";
 
         private const string ParametersQueueKey = "Parameters";
-
+        
         public PersistentQueue<InputItem> InputQueue => GetParameter<PersistentQueue<InputItem>>(InputsQueueKey);
 
         public PersistentQueue<CommandDefinition> CommandQueue => GetParameter<PersistentQueue<CommandDefinition>>(CommandsQueueKey);
@@ -21,21 +21,34 @@ namespace AlexaCore
 
         protected readonly Dictionary<string, object> ParameterQueues;
 
+        public Dictionary<string, object> DeviceSupportedInterfaces { get; }
+
+        public string DeviceId { get; }
+
         public ILambdaLogger Logger { get; }
 
-	    public string UserAccessToken => InputSession?.User?.AccessToken;
+        public string UserAccessToken => InputSession?.User?.AccessToken;
 
-		public string UserId => InputSession?.User?.UserId;
+        public string UserId => InputSession?.User?.UserId;
 
-		private Session InputSession { get; }
+        private Session InputSession { get; }
 
-	    public IntentParameters(ILambdaLogger logger, Session inputSession)
+        public IntentParameters(ILambdaLogger logger, Session inputSession) 
+            : this(logger, inputSession, null)
+        {
+        }
+
+        public IntentParameters(ILambdaLogger logger, Session inputSession, Device systemDevice)
 	    {
 		    Logger = logger;
 
 		    InputSession = inputSession;
 
-		    if (InputSession.Attributes == null)
+	        DeviceSupportedInterfaces = systemDevice?.SupportedInterfaces ?? new Dictionary<string, object>();
+
+	        DeviceId = systemDevice?.DeviceID ?? "";
+
+            if (InputSession.Attributes == null)
 		    {
 			    InputSession.Attributes = new Dictionary<string, object>();
 		    }
@@ -69,7 +82,7 @@ namespace AlexaCore
         {
             return ParameterQueues[key] as T;
         }
-
+       
         public Dictionary<string, object> SessionAttributes()
 	    {
 		    return InputSession.Attributes;
