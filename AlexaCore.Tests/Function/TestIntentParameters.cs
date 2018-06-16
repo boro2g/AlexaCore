@@ -7,7 +7,7 @@ namespace AlexaCore.Tests.Function
     {
         public const string TestKey = "TestKey";
 
-        public TestIntentParameters(ILambdaLogger logger, Session inputSession) : base(logger, inputSession, new Device())
+        public TestIntentParameters(ILambdaLogger logger, Session inputSession) : base(logger, inputSession)
         {
         }
 

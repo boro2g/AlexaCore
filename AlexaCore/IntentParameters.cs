@@ -33,6 +33,11 @@ namespace AlexaCore
 
         private Session InputSession { get; }
 
+        public IntentParameters(ILambdaLogger logger, Session inputSession) 
+            : this(logger, inputSession, null)
+        {
+        }
+
         public IntentParameters(ILambdaLogger logger, Session inputSession, Device systemDevice)
 	    {
 		    Logger = logger;
