@@ -5,6 +5,4 @@ build_script:
     dotnet --version
     dotnet restore AlexaCore.sln
     dotnet build AlexaCore.sln
-test: 
-- ps: >-    
     dotnet test AlexaCore.Tests
